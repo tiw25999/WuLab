@@ -1,102 +1,93 @@
 from docx import Document
-from docx.shared import Pt, RGBColor, Inches, Cm
+from docx.shared import Pt, RGBColor, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import datetime
 
 doc = Document()
 
-# ---- Page margin ----
+# ---- ขนาดหน้า / ขอบกระดาษ ----
 section = doc.sections[0]
 section.top_margin = Cm(2.5)
 section.bottom_margin = Cm(2.5)
 section.left_margin = Cm(3)
 section.right_margin = Cm(2.5)
 
-# ---- Helpers ----
+# ---- ฟังก์ชันช่วย ----
+BODY   = Pt(13)
+SMALL  = Pt(12)
+H1     = Pt(18)
+H2     = Pt(15)
+H3     = Pt(13)
+HEADER_CELL = Pt(12)
+DATA_CELL   = Pt(12)
+
 def heading(text, level=1, color=RGBColor(0x1A, 0x56, 0xDB)):
     p = doc.add_heading(text, level=level)
     run = p.runs[0] if p.runs else p.add_run(text)
     run.font.color.rgb = color
     run.font.bold = True
     if level == 1:
-        run.font.size = Pt(16)
+        run.font.size = H1
     elif level == 2:
-        run.font.size = Pt(13)
+        run.font.size = H2
     else:
-        run.font.size = Pt(11)
-    return p
-
-def para(text, bold=False, italic=False, size=11, indent=0):
-    p = doc.add_paragraph()
-    if indent:
-        p.paragraph_format.left_indent = Cm(indent)
-    run = p.add_run(text)
-    run.font.size = Pt(size)
-    run.bold = bold
-    run.italic = italic
+        run.font.size = H3
     return p
 
 def bullet(text, level=0):
     p = doc.add_paragraph(style='List Bullet')
     p.paragraph_format.left_indent = Cm(0.5 + level * 0.5)
     run = p.add_run(text)
-    run.font.size = Pt(10.5)
+    run.font.size = BODY
     return p
 
-def numbered(text, level=0):
+def numbered(text):
     p = doc.add_paragraph(style='List Number')
-    p.paragraph_format.left_indent = Cm(0.5 + level * 0.5)
+    p.paragraph_format.left_indent = Cm(0.5)
     run = p.add_run(text)
-    run.font.size = Pt(10.5)
+    run.font.size = BODY
     return p
 
 def divider():
-    p = doc.add_paragraph("─" * 80)
+    p = doc.add_paragraph("─" * 75)
     p.runs[0].font.color.rgb = RGBColor(0xCC, 0xCC, 0xCC)
     p.runs[0].font.size = Pt(8)
     p.paragraph_format.space_before = Pt(2)
     p.paragraph_format.space_after = Pt(2)
 
+def set_cell_bg(cell, hex_color):
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+    shd = OxmlElement('w:shd')
+    shd.set(qn('w:val'), 'clear')
+    shd.set(qn('w:color'), 'auto')
+    shd.set(qn('w:fill'), hex_color)
+    tcPr.append(shd)
+
 def add_table(headers, rows, col_widths=None):
     table = doc.add_table(rows=1 + len(rows), cols=len(headers))
     table.style = 'Table Grid'
-    # Header row
-    hdr = table.rows[0]
+    # แถวหัวตาราง
     for i, h in enumerate(headers):
-        cell = hdr.cells[i]
+        cell = table.rows[0].cells[i]
         cell.text = h
         run = cell.paragraphs[0].runs[0]
         run.bold = True
-        run.font.size = Pt(10)
+        run.font.size = HEADER_CELL
         run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
         cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        # Blue background
-        tc = cell._tc
-        tcPr = tc.get_or_add_tcPr()
-        shd = OxmlElement('w:shd')
-        shd.set(qn('w:val'), 'clear')
-        shd.set(qn('w:color'), 'auto')
-        shd.set(qn('w:fill'), '1A56DB')
-        tcPr.append(shd)
-    # Data rows
+        set_cell_bg(cell, '1A56DB')
+    # แถวข้อมูล
     for r_idx, row_data in enumerate(rows):
-        row = table.rows[r_idx + 1]
         for c_idx, val in enumerate(row_data):
-            cell = row.cells[c_idx]
+            cell = table.rows[r_idx + 1].cells[c_idx]
             cell.text = val
-            cell.paragraphs[0].runs[0].font.size = Pt(10)
+            cell.paragraphs[0].runs[0].font.size = DATA_CELL
             if r_idx % 2 == 1:
-                tc = cell._tc
-                tcPr = tc.get_or_add_tcPr()
-                shd = OxmlElement('w:shd')
-                shd.set(qn('w:val'), 'clear')
-                shd.set(qn('w:color'), 'auto')
-                shd.set(qn('w:fill'), 'EBF5FB')
-                tcPr.append(shd)
-    # Column widths
+                set_cell_bg(cell, 'EBF5FB')
+    # ความกว้างคอลัมน์
     if col_widths:
         for i, w in enumerate(col_widths):
             for row in table.rows:
@@ -104,181 +95,239 @@ def add_table(headers, rows, col_widths=None):
     return table
 
 # ================================================================
-# TITLE PAGE
+# หน้าปก
 # ================================================================
 doc.add_paragraph()
-title = doc.add_paragraph()
-title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = title.add_run("WuLab — Siam Master Concrete")
-run.font.size = Pt(22)
-run.font.bold = True
-run.font.color.rgb = RGBColor(0x1A, 0x56, 0xDB)
+t = doc.add_paragraph()
+t.alignment = WD_ALIGN_PARAGRAPH.CENTER
+r = t.add_run("WuLab — สยามมาสเตอร์คอนกรีต")
+r.font.size = Pt(24)
+r.font.bold = True
+r.font.color.rgb = RGBColor(0x1A, 0x56, 0xDB)
 
-subtitle = doc.add_paragraph()
-subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run2 = subtitle.add_run("แผนพัฒนาเว็บไซต์และระบบขาย  |  Feature List & Roadmap")
-run2.font.size = Pt(13)
-run2.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
+s = doc.add_paragraph()
+s.alignment = WD_ALIGN_PARAGRAPH.CENTER
+r2 = s.add_run("แผนพัฒนาเว็บไซต์และระบบขาย  |  รายการฟีเจอร์และแผนงาน")
+r2.font.size = Pt(14)
+r2.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
 
-date_p = doc.add_paragraph()
-date_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run3 = date_p.add_run(f"จัดทำวันที่ {datetime.date.today().strftime('%d/%m/%Y')}")
-run3.font.size = Pt(10)
-run3.font.color.rgb = RGBColor(0x88, 0x88, 0x88)
-run3.italic = True
+d = doc.add_paragraph()
+d.alignment = WD_ALIGN_PARAGRAPH.CENTER
+r3 = d.add_run(f"จัดทำวันที่ {datetime.date.today().strftime('%d/%m/%Y')}")
+r3.font.size = Pt(11)
+r3.font.color.rgb = RGBColor(0x88, 0x88, 0x88)
+r3.italic = True
 
 doc.add_paragraph()
 divider()
 doc.add_paragraph()
 
 # ================================================================
-# 1. COMPANY OVERVIEW
+# 1. ข้อมูลบริษัท
 # ================================================================
 heading("1. ข้อมูลบริษัท", 1)
 
 add_table(
     ["หัวข้อ", "รายละเอียด"],
     [
-        ["ชื่อบริษัท", "บริษัท สยามมาสเตอร์คอนกรีต จำกัด"],
-        ["ธุรกิจ", "ผลิตและจำหน่ายคอนกรีตอัดแรงสำเร็จรูป (Prestressed Concrete)"],
-        ["ก่อตั้ง", "ปี พ.ศ. 2537  (ประสบการณ์กว่า 30 ปี)"],
-        ["ภาษาเว็บ", "ไทย + อังกฤษ (Bilingual)"],
-        ["ช่องทางติดต่อ", "ออนไลน์  /  โทรศัพท์  /  Walk-in"],
-        ["ระบบลูกค้า", "ไม่มี Login — ใช้ฟอร์มขอใบเสนอราคา (RFQ)"],
-        ["ERP / ราคา", "ไม่มีระบบเชื่อมต่อ — บริหารราคา Manual ในระบบ"],
+        ["ชื่อบริษัท",        "บริษัท สยามมาสเตอร์คอนกรีต จำกัด"],
+        ["ประเภทธุรกิจ",      "ผลิตและจำหน่ายคอนกรีตอัดแรงสำเร็จรูป (Prestressed Concrete)"],
+        ["ปีที่ก่อตั้ง",      "พ.ศ. 2537 — ประสบการณ์กว่า 30 ปี"],
+        ["ภาษาที่ใช้",        "ไทย และ อังกฤษ"],
+        ["ช่องทางติดต่อลูกค้า","ออนไลน์  /  โทรศัพท์  /  เดินทางมาที่บริษัท (Walk-in)"],
+        ["ระบบสำหรับลูกค้า",  "ไม่ต้องสมัครสมาชิก — ส่งคำขอใบเสนอราคาได้เลย"],
+        ["ระบบราคา",          "กำหนดราคาในระบบเอง ไม่เชื่อมต่อโปรแกรมภายนอก"],
     ],
     col_widths=[5, 10.5]
 )
 
 doc.add_paragraph()
-heading("จุดแข็ง (Competitive Advantages)", 2)
-bullet("มาตรฐาน มอก. — ผลิตภัณฑ์ผ่านการรับรองมาตรฐานอุตสาหกรรมไทย")
-bullet("Hollow Core หายาก — ผู้ผลิตแผ่นพื้น Hollow Core มีน้อย ได้เปรียบในตลาด")
+heading("จุดแข็งของบริษัท", 2)
+bullet("ได้รับการรับรองมาตรฐาน มอก. — สร้างความมั่นใจให้ลูกค้า")
+bullet("แผ่นพื้น Hollow Core — มีผู้ผลิตน้อยในตลาด ได้เปรียบด้านการแข่งขัน")
 bullet("กำลังการผลิตสูง — รองรับโครงการขนาดใหญ่ได้")
-bullet("คุณภาพและความสวยงาม — ควบคุมคุณภาพจากโรงงาน ได้มาตรฐาน")
+bullet("คุณภาพและความสวยงาม — ควบคุมกระบวนการผลิตจากโรงงาน ได้มาตรฐาน")
 
 doc.add_paragraph()
 
 # ================================================================
-# 2. PRODUCTS
+# 2. ผลิตภัณฑ์หลัก
 # ================================================================
 heading("2. ผลิตภัณฑ์หลัก", 1)
 
 add_table(
-    ["#", "ผลิตภัณฑ์", "คำอธิบาย / การใช้งาน"],
+    ["ลำดับ", "ชื่อผลิตภัณฑ์", "การใช้งาน"],
     [
-        ["1", "เสาไฟฟ้าคอนกรีตอัดแรง", "เสาไฟฟ้าแรงสูง — งานระบบสาธารณูปโภค"],
-        ["2", "แผ่นพื้น Hollow Core", "พื้นสำเร็จรูป — อาคาร, คอนโด, คลังสินค้า, อาคารจอดรถ"],
-        ["3", "เสาเข็มคอนกรีตอัดแรง", "งานฐานราก — บ้านจัดสรร, อาคาร, โครงสร้างพื้นฐาน"],
+        ["1", "เสาไฟฟ้าคอนกรีตอัดแรง",
+         "เสาไฟฟ้าแรงสูง สำหรับงานระบบสาธารณูปโภค"],
+        ["2", "แผ่นพื้นสำเร็จรูป Hollow Core",
+         "พื้นสำเร็จรูป สำหรับอาคาร คอนโด คลังสินค้า อาคารจอดรถ"],
+        ["3", "เสาเข็มคอนกรีตอัดแรง",
+         "งานฐานราก สำหรับบ้านจัดสรร อาคาร และโครงสร้างพื้นฐาน"],
     ],
-    col_widths=[1.2, 5.5, 8.8]
+    col_widths=[1.5, 5.5, 8.5]
 )
 
 doc.add_paragraph()
 
 # ================================================================
-# 3. TARGET CUSTOMERS
+# 3. กลุ่มลูกค้าและเส้นทางการซื้อ
 # ================================================================
-heading("3. กลุ่มลูกค้าเป้าหมาย", 1)
+heading("3. กลุ่มลูกค้าและเส้นทางการซื้อ", 1)
 
 add_table(
-    ["กลุ่ม", "ลักษณะ", "Use Cases", "Journey หลัก"],
+    ["กลุ่มลูกค้า", "ลักษณะ", "ตัวอย่างงาน", "ขั้นตอนหลัก"],
     [
-        ["ลูกค้าทั่วไป", "บุคคล / ผู้รับเหมารายย่อย",
-         "บ้านจัดสรร, งานก่อสร้างขนาดเล็ก",
+        ["ลูกค้าทั่วไป",
+         "บุคคลทั่วไป / ผู้รับเหมารายย่อย",
+         "บ้านจัดสรร งานก่อสร้างขนาดเล็ก",
          "ดูสินค้า → ขอใบเสนอราคา → ติดต่อ"],
-        ["ลูกค้าเอกชน", "บริษัทรับเหมา / Developer",
-         "อาคาร, คลังสินค้า, โรงงาน, คอนโด",
-         "ดูสินค้า → Spec → RFQ → เจรจา"],
-        ["ลูกค้ารัฐ", "หน่วยงานราชการ / รัฐวิสาหกิจ",
-         "สะพาน, ถนน, รถไฟ, สาธารณูปโภค",
+        ["ลูกค้าเอกชน",
+         "บริษัทรับเหมา / ผู้พัฒนาอสังหาริมทรัพย์",
+         "อาคาร คลังสินค้า โรงงาน คอนโด",
+         "ดูสินค้า → ดูสเปค → ขอใบเสนอราคา → เจรจา"],
+        ["ลูกค้าภาครัฐ",
+         "หน่วยงานราชการ / รัฐวิสาหกิจ",
+         "สะพาน ถนน รถไฟ สาธารณูปโภค",
          "ดูเอกสาร → ข้อมูลประกวดราคา → ติดต่อ"],
     ],
-    col_widths=[3, 4, 4.5, 4]
+    col_widths=[3.5, 4, 4, 4]
 )
 
 doc.add_paragraph()
 
 # ================================================================
-# 4. FEATURE LIST
+# 4. รายการฟีเจอร์ทั้งหมด
 # ================================================================
-heading("4. Feature List ทั้งหมด", 1)
+heading("4. รายการฟีเจอร์ทั้งหมด", 1)
 
-# --- 4.1 Company Storytelling ---
-heading("4.1  Company Storytelling", 2)
+# 4.1
+heading("4.1  การนำเสนอบริษัท (Company Storytelling)", 2)
 add_table(
-    ["Feature", "รายละเอียด", "Priority"],
+    ["ฟีเจอร์", "รายละเอียด", "ความสำคัญ"],
     [
-        ["Landing Page", "Hero section, จุดเด่นบริษัท, CTA ขอใบเสนอราคา", "Must"],
-        ["เกี่ยวกับเรา", "ประวัติ 30 ปี, วิสัยทัศน์, ค่านิยม, ทีมงาน", "Must"],
-        ["ความน่าเชื่อถือ", "โลโก้ มอก., ใบรับรองมาตรฐาน, จำนวนโปรเจคที่ผ่านมา", "Must"],
-        ["Portfolio / ผลงาน", "ภาพและรายละเอียดโปรเจคอ้างอิง แยกตาม Use Case", "Should"],
-        ["ข่าวสาร / บทความ", "ข่าวบริษัท, บทความวิชาการ Prestressed Concrete", "Could"],
-    ],
-    col_widths=[4, 9, 2.5]
-)
-
-doc.add_paragraph()
-
-# --- 4.2 Product Catalog ---
-heading("4.2  Product Catalog", 2)
-add_table(
-    ["Feature", "รายละเอียด", "Priority"],
-    [
-        ["รายการสินค้าทั้งหมด", "Grid/List view ครบ 3 ผลิตภัณฑ์ + รูปภาพ", "Must"],
-        ["หน้าสินค้ารายการ", "Spec ครบ, ขนาด, น้ำหนัก, กำลังรับแรง, Use Case, ภาพ", "Must"],
-        ["ดาวน์โหลด Datasheet", "PDF Spec Sheet / ใบรับรอง มอก. ดาวน์โหลดได้", "Must"],
-        ["ตัวกรองสินค้า", "Filter ตามประเภท / การใช้งาน", "Should"],
-        ["เปรียบเทียบสินค้า", "Compare ข้าม Spec ได้", "Could"],
-    ],
-    col_widths=[4, 9, 2.5]
-)
-
-doc.add_paragraph()
-
-# --- 4.3 Sales Flow ---
-heading("4.3  Sales Flow (RFQ System)", 2)
-add_table(
-    ["Feature", "รายละเอียด", "Priority"],
-    [
-        ["ฟอร์ม RFQ — ทั่วไป", "ชื่อ, เบอร์โทร, อีเมล, สินค้าที่สนใจ, ปริมาณ, ข้อความ", "Must"],
-        ["ฟอร์ม RFQ — เอกชน", "ข้อมูลบริษัท + ประเภทโปรเจค + ไฟล์แนบ (แบบ)", "Must"],
-        ["ฟอร์ม RFQ — รัฐ", "ข้อมูลหน่วยงาน + เลขที่จัดซื้อจัดจ้าง + เอกสาร", "Must"],
-        ["Email Notification", "ส่ง email ยืนยันให้ลูกค้า + แจ้งเตือน Admin", "Must"],
-        ["หน้า Thank You", "แสดงเลข Reference + สรุปข้อมูลที่ส่งมา", "Must"],
-        ["ติดตาม Inquiry", "ลูกค้า track status ด้วย Reference Number", "Should"],
+        ["หน้าแรก (Landing Page)",
+         "ส่วนแนะนำบริษัท จุดเด่น และปุ่มขอใบเสนอราคา",
+         "ต้องมี"],
+        ["เกี่ยวกับเรา",
+         "ประวัติบริษัท 30 ปี วิสัยทัศน์ ค่านิยม ทีมงาน",
+         "ต้องมี"],
+        ["ความน่าเชื่อถือ",
+         "โลโก้ มอก. ใบรับรองมาตรฐาน สถิติโปรเจกต์ที่ผ่านมา",
+         "ต้องมี"],
+        ["ผลงานอ้างอิง (Portfolio)",
+         "ภาพและรายละเอียดโปรเจกต์ที่เคยทำ แยกตามประเภทงาน",
+         "ควรมี"],
+        ["ข่าวสาร / บทความ",
+         "ข่าวบริษัท บทความให้ความรู้เรื่องคอนกรีตอัดแรง",
+         "มีถ้าเวลาเหลือ"],
     ],
     col_widths=[4.5, 8.5, 2.5]
 )
 
 doc.add_paragraph()
 
-# --- 4.4 Admin Dashboard ---
-heading("4.4  Admin Dashboard", 2)
+# 4.2
+heading("4.2  แคตาล็อกสินค้า (Product Catalog)", 2)
 add_table(
-    ["Feature", "รายละเอียด", "Priority"],
+    ["ฟีเจอร์", "รายละเอียด", "ความสำคัญ"],
     [
-        ["Admin Login", "Username + Password ปลอดภัย (JWT)", "Must"],
-        ["รายการ Inquiry", "ดู Inquiry ทั้งหมด พร้อม filter ตามสถานะ / วันที่ / กลุ่ม", "Must"],
-        ["จัดการ Inquiry", "เปลี่ยน status (ใหม่ → กำลังดำเนินการ → เสร็จสิ้น)", "Must"],
-        ["จัดการสินค้า", "CRUD ข้อมูลสินค้า + อัปโหลดภาพ + Datasheet", "Must"],
-        ["จัดการเนื้อหา", "แก้ไข About / Portfolio / ข่าวสาร", "Should"],
-        ["Dashboard สรุป", "จำนวน Inquiry วันนี้ / เดือนนี้ / กราฟ", "Could"],
-        ["Export รายงาน", "Export Inquiry เป็น Excel / CSV", "Could"],
+        ["รายการสินค้าทั้งหมด",
+         "แสดงสินค้าครบทั้ง 3 รายการ พร้อมรูปภาพ",
+         "ต้องมี"],
+        ["หน้าสินค้าแต่ละรายการ",
+         "สเปคครบ ขนาด น้ำหนัก กำลังรับแรง ตัวอย่างการใช้งาน รูปภาพ",
+         "ต้องมี"],
+        ["ดาวน์โหลดใบสเปค (Datasheet)",
+         "ไฟล์ PDF สเปคสินค้า และใบรับรอง มอก. ดาวน์โหลดได้",
+         "ต้องมี"],
+        ["กรองสินค้า",
+         "กรองตามประเภทสินค้า หรือประเภทการใช้งาน",
+         "ควรมี"],
+        ["เปรียบเทียบสินค้า",
+         "เปรียบเทียบสเปคระหว่างสินค้าได้",
+         "มีถ้าเวลาเหลือ"],
     ],
     col_widths=[4.5, 8.5, 2.5]
 )
 
 doc.add_paragraph()
 
-# --- 4.5 Customer Portal (Optional) ---
-heading("4.5  Customer Portal (Optional — Phase 3)", 2)
+# 4.3
+heading("4.3  ระบบขอใบเสนอราคา (RFQ)", 2)
 add_table(
-    ["Feature", "รายละเอียด", "Priority"],
+    ["ฟีเจอร์", "รายละเอียด", "ความสำคัญ"],
     [
-        ["Login ลูกค้าเอกชน", "Account สำหรับลูกค้าที่สั่งประจำ", "Could"],
-        ["ประวัติ Inquiry", "ดูรายการ RFQ ที่เคยส่ง + สถานะ", "Could"],
-        ["เอกสารสำหรับลูกค้ารัฐ", "ข้อมูล + เอกสารสนับสนุนการจัดซื้อจัดจ้าง", "Could"],
+        ["แบบฟอร์ม — ลูกค้าทั่วไป",
+         "ชื่อ เบอร์โทร อีเมล สินค้าที่สนใจ ปริมาณ ข้อความเพิ่มเติม",
+         "ต้องมี"],
+        ["แบบฟอร์ม — ลูกค้าเอกชน",
+         "ข้อมูลบริษัท ประเภทโปรเจกต์ แนบไฟล์แบบก่อสร้างได้",
+         "ต้องมี"],
+        ["แบบฟอร์ม — ลูกค้าภาครัฐ",
+         "ข้อมูลหน่วยงาน เลขที่จัดซื้อจัดจ้าง แนบเอกสารได้",
+         "ต้องมี"],
+        ["แจ้งเตือนอีเมล",
+         "ส่งอีเมลยืนยันให้ลูกค้า และแจ้งเตือนผู้ดูแลระบบ",
+         "ต้องมี"],
+        ["หน้ายืนยันการส่ง",
+         "แสดงรหัสอ้างอิง และสรุปข้อมูลที่ส่งมา",
+         "ต้องมี"],
+        ["ติดตามสถานะคำขอ",
+         "ลูกค้าตรวจสอบสถานะได้ด้วยรหัสอ้างอิง",
+         "ควรมี"],
+    ],
+    col_widths=[4.5, 8.5, 2.5]
+)
+
+doc.add_paragraph()
+
+# 4.4
+heading("4.4  หน้าจัดการสำหรับผู้ดูแลระบบ (Admin)", 2)
+add_table(
+    ["ฟีเจอร์", "รายละเอียด", "ความสำคัญ"],
+    [
+        ["เข้าสู่ระบบผู้ดูแล",
+         "ชื่อผู้ใช้ + รหัสผ่าน ระบบรักษาความปลอดภัยด้วย JWT",
+         "ต้องมี"],
+        ["รายการคำขอใบเสนอราคา",
+         "ดูคำขอทั้งหมด กรองตามสถานะ วันที่ กลุ่มลูกค้า",
+         "ต้องมี"],
+        ["จัดการคำขอใบเสนอราคา",
+         "เปลี่ยนสถานะ: ใหม่ → กำลังดำเนินการ → เสร็จสิ้น",
+         "ต้องมี"],
+        ["จัดการสินค้า",
+         "เพิ่ม แก้ไข ลบข้อมูลสินค้า อัปโหลดรูปภาพและใบสเปค",
+         "ต้องมี"],
+        ["จัดการเนื้อหา",
+         "แก้ไขหน้าเกี่ยวกับเรา ผลงาน ข่าวสาร",
+         "ควรมี"],
+        ["สรุปภาพรวม (Dashboard)",
+         "จำนวนคำขอวันนี้ เดือนนี้ กราฟสถิติ",
+         "มีถ้าเวลาเหลือ"],
+        ["ส่งออกรายงาน",
+         "ส่งออกรายการคำขอเป็นไฟล์ Excel",
+         "มีถ้าเวลาเหลือ"],
+    ],
+    col_widths=[4.5, 8.5, 2.5]
+)
+
+doc.add_paragraph()
+
+# 4.5
+heading("4.5  พื้นที่สำหรับลูกค้า (ระยะที่ 3 — เพิ่มเติม)", 2)
+add_table(
+    ["ฟีเจอร์", "รายละเอียด", "ความสำคัญ"],
+    [
+        ["เข้าสู่ระบบลูกค้าเอกชน",
+         "บัญชีสำหรับลูกค้าที่สั่งซื้อประจำ",
+         "มีถ้าเวลาเหลือ"],
+        ["ประวัติการขอใบเสนอราคา",
+         "ดูรายการที่เคยส่ง พร้อมสถานะล่าสุด",
+         "มีถ้าเวลาเหลือ"],
+        ["เอกสารสำหรับลูกค้าภาครัฐ",
+         "ข้อมูลและเอกสารประกอบการจัดซื้อจัดจ้าง",
+         "มีถ้าเวลาเหลือ"],
     ],
     col_widths=[4.5, 8.5, 2.5]
 )
@@ -286,81 +335,81 @@ add_table(
 doc.add_paragraph()
 
 # ================================================================
-# 5. TECH STACK
+# 5. เทคโนโลยีที่ใช้
 # ================================================================
-heading("5. Tech Stack", 1)
+heading("5. เทคโนโลยีที่ใช้", 1)
 
 add_table(
-    ["Layer", "Technology", "หมายเหตุ"],
+    ["ส่วน", "เทคโนโลยี", "หมายเหตุ"],
     [
-        ["Frontend + Backend", "Next.js 14  (App Router)", "Full-stack framework"],
-        ["Database (Dev)", "Prisma ORM + SQLite", "ไม่ต้อง Docker"],
-        ["Database (Prod)", "Prisma ORM + PostgreSQL", "Migrate ตอน deploy"],
-        ["Styling", "Tailwind CSS", "Utility-first"],
-        ["Images", "Cloudinary หรือ Local", "รูปสินค้า / Portfolio"],
-        ["Auth (Admin)", "bcryptjs + JWT", "Session ปลอดภัย"],
-        ["Email", "Resend หรือ Nodemailer", "RFQ notification"],
-        ["Deploy", "Vercel", "CI/CD อัตโนมัติ"],
-        ["Repo", "github.com/tiw25999/WuLab", "Branch: main"],
+        ["หน้าเว็บ + ระบบหลัง",   "Next.js 14 (App Router)",         "เฟรมเวิร์กเดียวจัดการทั้งหมด"],
+        ["ฐานข้อมูล (พัฒนา)",     "Prisma ORM + SQLite",             "ไม่ต้องติดตั้ง Docker"],
+        ["ฐานข้อมูล (ใช้งานจริง)", "Prisma ORM + PostgreSQL",        "ย้ายง่ายตอน Deploy"],
+        ["หน้าตาเว็บ",            "Tailwind CSS",                    "ปรับแต่งได้ยืดหยุ่น"],
+        ["รูปภาพ",                "Cloudinary หรือเก็บในเซิร์ฟเวอร์", "รูปสินค้าและผลงาน"],
+        ["ระบบรักษาความปลอดภัย",  "bcryptjs + JWT",                  "สำหรับผู้ดูแลระบบ"],
+        ["อีเมล",                 "Resend หรือ Nodemailer",           "แจ้งเตือนเมื่อมีคำขอ"],
+        ["การ Deploy",            "Vercel",                           "อัปเดตอัตโนมัติเมื่อ Push"],
+        ["ที่เก็บโค้ด",           "github.com/tiw25999/WuLab",       "สาขาหลัก: main"],
     ],
-    col_widths=[4, 5, 6.5]
+    col_widths=[4, 5.5, 6]
 )
 
 doc.add_paragraph()
 
 # ================================================================
-# 6. ROADMAP
+# 6. แผนการพัฒนา (Roadmap)
 # ================================================================
-heading("6. Roadmap", 1)
+heading("6. แผนการพัฒนา", 1)
 
-heading("Phase 1 — MVP Showcase  (Demo / Pitch)", 2)
-numbered("Landing page — Hero, จุดเด่น, CTA")
-numbered("เกี่ยวกับเรา — ประวัติบริษัท 30 ปี, ใบรับรอง มอก.")
-numbered("Product Catalog — 3 สินค้า + Spec + ภาพจริง + ดาวน์โหลด Datasheet")
-numbered("ฟอร์ม RFQ แยก 3 กลุ่มลูกค้า + Email Notification")
-numbered("Bilingual (TH / EN) ทุกหน้า")
+heading("ระยะที่ 1 — เวอร์ชันแรก (สำหรับนำเสนอ)", 2)
+numbered("หน้าแรก — แนะนำบริษัท จุดเด่น และปุ่มขอใบเสนอราคา")
+numbered("เกี่ยวกับเรา — ประวัติบริษัท 30 ปี ใบรับรอง มอก.")
+numbered("แคตาล็อกสินค้า — 3 รายการ พร้อมสเปค รูปภาพจริง และดาวน์โหลดใบสเปค")
+numbered("แบบฟอร์มขอใบเสนอราคา แยกตามกลุ่มลูกค้า + แจ้งเตือนอีเมล")
+numbered("รองรับสองภาษา ไทย และ อังกฤษ ทุกหน้า")
 
 doc.add_paragraph()
-heading("Phase 2 — Sales System", 2)
-numbered("Admin Dashboard — จัดการ Inquiry, เปลี่ยน Status")
-numbered("จัดการสินค้าผ่าน Admin (CRUD + อัปโหลดภาพ)")
-numbered("Customer Inquiry Tracking (Reference Number)")
-numbered("Portfolio / ผลงาน")
-numbered("Export รายงาน Excel")
+heading("ระยะที่ 2 — ระบบขาย", 2)
+numbered("หน้าจัดการสำหรับผู้ดูแล — ดูและจัดการคำขอใบเสนอราคา")
+numbered("จัดการข้อมูลสินค้าผ่านหน้าแอดมิน")
+numbered("ลูกค้าติดตามสถานะคำขอด้วยรหัสอ้างอิง")
+numbered("หน้าผลงานอ้างอิง (Portfolio)")
+numbered("ส่งออกรายงานเป็นไฟล์ Excel")
 
 doc.add_paragraph()
-heading("Phase 3 — Customer Portal  (Optional)", 2)
-numbered("Login ลูกค้าเอกชน")
-numbered("ประวัติ Inquiry / คำสั่งซื้อ")
-numbered("เอกสารจัดซื้อจัดจ้างสำหรับลูกค้ารัฐ")
+heading("ระยะที่ 3 — พื้นที่สำหรับลูกค้า (เพิ่มเติม)", 2)
+numbered("ระบบเข้าสู่ระบบสำหรับลูกค้าเอกชน")
+numbered("ประวัติการขอใบเสนอราคาและคำสั่งซื้อ")
+numbered("เอกสารประกอบการจัดซื้อจัดจ้างสำหรับลูกค้าภาครัฐ")
 
 doc.add_paragraph()
 
 # ================================================================
-# 7. PRIORITY LEGEND
+# 7. ระดับความสำคัญของฟีเจอร์
 # ================================================================
-heading("7. Priority Legend", 1)
+heading("7. ระดับความสำคัญของฟีเจอร์", 1)
 add_table(
     ["ระดับ", "ความหมาย"],
     [
-        ["Must", "ต้องมีใน Phase 1 — ขาดไม่ได้"],
-        ["Should", "ควรมีใน Phase 2 — เพิ่มคุณค่า"],
-        ["Could", "มีถ้าเวลาเหลือ — Nice to have"],
+        ["ต้องมี",              "ฟีเจอร์หลัก ขาดไม่ได้ ต้องเสร็จในระยะที่ 1"],
+        ["ควรมี",              "เพิ่มคุณค่า ทำในระยะที่ 2"],
+        ["มีถ้าเวลาเหลือ",     "ฟีเจอร์เสริม ทำในระยะที่ 3 หรือหลังจากนั้น"],
     ],
-    col_widths=[3, 12.5]
+    col_widths=[4, 11.5]
 )
 
 doc.add_paragraph()
 divider()
 p = doc.add_paragraph()
 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run("WuLab  —  บริษัท สยามมาสเตอร์คอนกรีต จำกัด  |  เอกสารนี้จัดทำโดย AI Planning Assistant")
-run.font.size = Pt(9)
+run = p.add_run("บริษัท สยามมาสเตอร์คอนกรีต จำกัด  |  เอกสารวางแผนเว็บไซต์ WuLab")
+run.font.size = Pt(10)
 run.font.color.rgb = RGBColor(0xAA, 0xAA, 0xAA)
 run.italic = True
 
 # ================================================================
-# SAVE
+# บันทึกไฟล์
 # ================================================================
 output_path = r"C:\Users\Win11\Desktop\CLAUDE MAX\Project\WuLab\docs\WuLab-FeaturePlan.docx"
 doc.save(output_path)
