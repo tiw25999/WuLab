@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WuLab — RFQ Form Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Sarabun:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:     #0D0F14;
+    --dark:    #141720;
+    --surface: #1C2030;
+    --card:    #20263A;
+    --border:  #2A2F42;
+    --border2: #353B52;
+    --amber:   #E8A838;
+    --amber2:  #F5C842;
+    --stone:   #8B8D96;
+    --muted:   #5A5E6B;
+    --white:   #F2F0EB;
+    --blue:    #4A90D9;
+    --red:     #E74C3C;
+  }
+
+  body {
+    background: var(--ink);
+    color: var(--white);
+    font-family: 'Sarabun', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 72px;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 36px; height: 36px; background: var(--amber);
+    display: grid; place-items: center;
+    font-family: 'Playfair Display', serif; font-weight: 900; font-size: 17px;
+    color: var(--ink);
+  }
+  .logo-name { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--stone); text-decoration: none; }
+  .nav-links a.active { color: var(--amber); }
+
+  /* ─── MAIN LAYOUT ─── */
+  .rfq-layout {
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    min-height: calc(100vh - 72px);
+  }
+
+  /* ─── LEFT INFO PANEL ─── */
+  .info-panel {
+    padding: 64px 56px;
+    border-right: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .info-panel::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 64px 64px;
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .info-step {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--amber); margin-bottom: 16px;
+  }
+  .info-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: clamp(36px, 4vw, 56px);
+    line-height: 1.05; letter-spacing: -1.5px;
+    color: var(--white); margin-bottom: 20px;
+  }
+  .info-title em { font-style: italic; color: var(--amber); }
+  .info-desc {
+    font-size: 15px; line-height: 1.75; color: var(--stone);
+    max-width: 480px; margin-bottom: 48px;
+  }
+
+  /* process steps */
+  .process { display: flex; flex-direction: column; gap: 0; margin-bottom: 48px; }
+  .process-item {
+    display: grid; grid-template-columns: 48px 1fr;
+    gap: 20px; align-items: start;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .process-item:first-child { border-top: 1px solid var(--border); }
+  .process-num {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-size: 28px;
+    color: var(--amber); line-height: 1;
+    padding-top: 2px;
+  }
+  .process-title { font-weight: 600; font-size: 15px; color: var(--white); margin-bottom: 4px; }
+  .process-desc { font-size: 13px; color: var(--stone); line-height: 1.6; }
+
+  /* contact info */
+  .contact-list { display: flex; flex-direction: column; gap: 12px; }
+  .contact-item {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .contact-icon {
+    width: 36px; height: 36px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: grid; place-items: center; font-size: 16px; flex-shrink: 0;
+  }
+  .contact-text { font-size: 14px; color: var(--stone); }
+  .contact-text strong { color: var(--white); display: block; font-size: 13px; }
+
+  /* ─── FORM PANEL ─── */
+  .form-panel {
+    background: var(--surface);
+    padding: 48px 40px;
+    overflow-y: auto;
+  }
+
+  .form-header { margin-bottom: 32px; }
+  .form-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .form-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-size: 26px; letter-spacing: -0.5px;
+    color: var(--white);
+  }
+
+  /* TYPE SELECTOR */
+  .type-selector {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px; margin-bottom: 32px;
+  }
+  .type-btn {
+    padding: 12px 8px; background: var(--card);
+    border: 1px solid var(--border); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: all .2s;
+  }
+  .type-btn.active {
+    background: rgba(232,168,56,0.1);
+    border-color: var(--amber);
+  }
+  .type-btn:hover:not(.active) { border-color: var(--border2); }
+  .type-icon { font-size: 20px; }
+  .type-name {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    color: var(--stone);
+  }
+  .type-btn.active .type-name { color: var(--amber); }
+
+  /* FORM FIELDS */
+  .field-group { margin-bottom: 20px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-label {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--stone); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field-required {
+    color: var(--amber); font-family: 'DM Mono', monospace; font-size: 14px;
+  }
+  .field-input {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--border); color: var(--white);
+    padding: 12px 14px; font-family: 'Sarabun', sans-serif;
+    font-size: 14px; outline: none;
+    transition: border-color .2s;
+  }
+  .field-input:focus { border-color: var(--amber); }
+  .field-input::placeholder { color: var(--muted); }
+  .field-select {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--border); color: var(--stone);
+    padding: 12px 14px; font-family: 'Sarabun', sans-serif;
+    font-size: 14px; outline: none; cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A5E6B' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+  .field-textarea {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--border); color: var(--white);
+    padding: 12px 14px; font-family: 'Sarabun', sans-serif;
+    font-size: 14px; outline: none; resize: vertical;
+    min-height: 100px;
+    transition: border-color .2s;
+  }
+  .field-textarea:focus { border-color: var(--amber); }
+  .field-textarea::placeholder { color: var(--muted); }
+
+  /* product checkboxes */
+  .product-checks {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .product-check {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; background: var(--card);
+    border: 1px solid var(--border); cursor: pointer;
+    transition: border-color .2s;
+  }
+  .product-check.checked { border-color: rgba(232,168,56,0.4); }
+  .check-box {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border: 1.5px solid var(--border);
+    display: grid; place-items: center;
+  }
+  .check-box.checked {
+    background: var(--amber); border-color: var(--amber);
+    color: var(--ink); font-size: 11px;
+  }
+  .check-name { font-size: 13px; color: var(--stone); }
+  .product-check.checked .check-name { color: var(--white); }
+
+  /* divider */
+  .form-divider {
+    height: 1px; background: var(--border);
+    margin: 24px 0;
+  }
+  .form-section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px;
+  }
+
+  /* upload zone */
+  .upload-zone {
+    border: 1px dashed var(--border); padding: 20px;
+    text-align: center; cursor: pointer;
+    transition: border-color .2s;
+  }
+  .upload-zone:hover { border-color: var(--amber); }
+  .upload-icon { font-size: 24px; margin-bottom: 8px; }
+  .upload-text { font-size: 13px; color: var(--muted); }
+  .upload-text span { color: var(--amber); }
+
+  /* submit */
+  .form-submit { margin-top: 28px; }
+  .btn-submit {
+    width: 100%; background: var(--amber); color: var(--ink);
+    border: none; padding: 16px;
+    font-family: 'Sarabun', sans-serif;
+    font-weight: 700; font-size: 15px; letter-spacing: 0.06em;
+    cursor: pointer; transition: background .2s, transform .15s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .btn-submit:hover { background: var(--amber2); transform: translateY(-1px); }
+  .submit-note {
+    text-align: center; margin-top: 14px;
+    font-size: 12px; color: var(--muted);
+  }
+  .submit-note strong { color: var(--amber); }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark">W</div>
+    <div class="logo-name">Siam Master Concrete</div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">เกี่ยวกับเรา</a></li>
+    <li><a href="#">สินค้า</a></li>
+    <li><a href="#">ผลงาน</a></li>
+    <li><a href="#" class="active">ขอใบเสนอราคา</a></li>
+  </ul>
+</nav>
+
+<div class="rfq-layout">
+
+  <!-- LEFT INFO -->
+  <div class="info-panel">
+    <div class="info-step">03 — ติดต่อเรา</div>
+    <h1 class="info-title">
+      ขอ<em>ใบ</em><br>
+      เสนอ<br>
+      ราคา
+    </h1>
+    <p class="info-desc">
+      กรอกข้อมูลด้านขวา ทีมงานของเราจะติดต่อกลับภายใน
+      1–2 วันทำการ พร้อมใบเสนอราคาที่เหมาะกับโปรเจกต์ของคุณ
+    </p>
+
+    <div class="process">
+      <div class="process-item">
+        <div class="process-num">01</div>
+        <div>
+          <div class="process-title">กรอกข้อมูล</div>
+          <div class="process-desc">เลือกประเภทลูกค้าและกรอกข้อมูลโปรเจกต์ของคุณ</div>
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-num">02</div>
+        <div>
+          <div class="process-title">รับอีเมลยืนยัน</div>
+          <div class="process-desc">ระบบส่งรหัสอ้างอิงให้คุณทันที เพื่อติดตามสถานะ</div>
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-num">03</div>
+        <div>
+          <div class="process-title">ทีมงานติดต่อกลับ</div>
+          <div class="process-desc">ภายใน 1–2 วันทำการ พร้อมใบเสนอราคาที่เหมาะสม</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-list">
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div class="contact-text">
+          <strong>โทรศัพท์</strong>
+          0x-xxxx-xxxx
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">✉️</div>
+        <div class="contact-text">
+          <strong>อีเมล</strong>
+          sales@siammasterconcrete.com
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div class="contact-text">
+          <strong>Walk-in ยินดีต้อนรับ</strong>
+          จันทร์–ศุกร์ 08:00–17:00
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-panel">
+    <div class="form-header">
+      <div class="form-label">Request for Quotation</div>
+      <div class="form-title">แบบฟอร์มขอใบเสนอราคา</div>
+    </div>
+
+    <!-- TYPE SELECTOR -->
+    <div class="type-selector">
+      <div class="type-btn active">
+        <div class="type-icon">👤</div>
+        <div class="type-name">ลูกค้าทั่วไป</div>
+      </div>
+      <div class="type-btn">
+        <div class="type-icon">🏢</div>
+        <div class="type-name">บริษัทเอกชน</div>
+      </div>
+      <div class="type-btn">
+        <div class="type-icon">🏛️</div>
+        <div class="type-name">ภาครัฐ</div>
+      </div>
+    </div>
+
+    <!-- PERSONAL INFO -->
+    <div class="form-section-title">ข้อมูลผู้ติดต่อ</div>
+
+    <div class="field-group">
+      <div class="field-row">
+        <div>
+          <div class="field-label">ชื่อ-นามสกุล <span class="field-required">*</span></div>
+          <input class="field-input" placeholder="สมชาย ใจดี" type="text">
+        </div>
+        <div>
+          <div class="field-label">เบอร์โทรศัพท์ <span class="field-required">*</span></div>
+          <input class="field-input" placeholder="08x-xxx-xxxx" type="tel">
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">อีเมล <span class="field-required">*</span></div>
+      <input class="field-input" placeholder="email@example.com" type="email">
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- PRODUCT SELECTION -->
+    <div class="form-section-title">สินค้าที่สนใจ <span style="color:var(--amber)">*</span></div>
+    <div class="field-group">
+      <div class="product-checks">
+        <div class="product-check checked">
+          <div class="check-box checked">✓</div>
+          <span class="check-name">เสาไฟฟ้าคอนกรีตอัดแรง</span>
+        </div>
+        <div class="product-check">
+          <div class="check-box"></div>
+          <span class="check-name">แผ่นพื้นสำเร็จรูป Hollow Core</span>
+        </div>
+        <div class="product-check">
+          <div class="check-box"></div>
+          <span class="check-name">เสาเข็มคอนกรีตอัดแรง</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- PROJECT INFO -->
+    <div class="form-section-title">ข้อมูลโปรเจกต์</div>
+
+    <div class="field-group">
+      <div class="field-label">ปริมาณที่ต้องการ (โดยประมาณ)</div>
+      <input class="field-input" placeholder="เช่น 500 ตร.ม. / 200 ต้น" type="text">
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">รายละเอียดโปรเจกต์</div>
+      <textarea class="field-textarea" placeholder="อธิบายโปรเจกต์ ขนาด สถานที่ หรือข้อกำหนดพิเศษ..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">แนบไฟล์ (แบบก่อสร้าง, spec, ฯลฯ)</div>
+      <div class="upload-zone">
+        <div class="upload-icon">📎</div>
+        <div class="upload-text"><span>คลิกเพื่อเลือกไฟล์</span> หรือลากวางที่นี่<br>PDF, DWG, PNG — ไม่เกิน 10MB</div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="form-submit">
+      <button class="btn-submit">
+        ส่งคำขอใบเสนอราคา →
+      </button>
+      <div class="submit-note">
+        รับ <strong>รหัสอ้างอิง</strong> ทางอีเมลทันทีหลังส่ง
+        · ทีมงานติดต่อกลับภายใน 1–2 วันทำการ
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

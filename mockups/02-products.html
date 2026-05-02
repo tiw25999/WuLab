@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WuLab — Product Catalog Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Sarabun:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:     #0D0F14;
+    --dark:    #141720;
+    --surface: #1C2030;
+    --card:    #20263A;
+    --border:  #2A2F42;
+    --amber:   #E8A838;
+    --amber2:  #F5C842;
+    --stone:   #8B8D96;
+    --muted:   #5A5E6B;
+    --white:   #F2F0EB;
+    --green:   #2ECC71;
+  }
+
+  body {
+    background: var(--ink);
+    color: var(--white);
+    font-family: 'Sarabun', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 72px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,15,20,0.9);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 36px; height: 36px; background: var(--amber);
+    display: grid; place-items: center;
+    font-family: 'Playfair Display', serif; font-weight: 900; font-size: 17px;
+    color: var(--ink);
+  }
+  .logo-name {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--white);
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--stone); text-decoration: none; }
+  .nav-links a.active { color: var(--amber); }
+  .btn-sm {
+    background: var(--amber); color: var(--ink);
+    border: none; padding: 9px 20px;
+    font-weight: 600; font-size: 12px; letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  /* ─── PAGE HEADER ─── */
+  .page-header {
+    padding: 56px 48px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+  .page-breadcrumb {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.1em; margin-bottom: 12px;
+  }
+  .page-breadcrumb span { color: var(--amber); }
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: 48px;
+    letter-spacing: -2px; line-height: 1;
+    color: var(--white);
+  }
+  .page-title em { font-style: italic; color: var(--amber); }
+  .page-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: var(--muted);
+  }
+  .page-count strong { color: var(--white); font-size: 28px; }
+
+  /* ─── LAYOUT ─── */
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 72px);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 32px 24px;
+    position: sticky; top: 72px; align-self: start;
+    height: calc(100vh - 72px); overflow-y: auto;
+  }
+  .sidebar-section { margin-bottom: 36px; }
+  .sidebar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 14px;
+  }
+  .filter-list { display: flex; flex-direction: column; gap: 2px; }
+  .filter-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .2s; border-radius: 2px;
+  }
+  .filter-item.active {
+    background: rgba(232,168,56,0.08);
+    border-color: rgba(232,168,56,0.25);
+  }
+  .filter-item:hover:not(.active) { background: var(--surface); }
+  .filter-name { font-size: 13px; color: var(--stone); }
+  .filter-item.active .filter-name { color: var(--amber); font-weight: 600; }
+  .filter-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    background: var(--border); padding: 2px 6px; border-radius: 2px;
+  }
+
+  .mok-badge {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px; background: rgba(46,204,113,0.07);
+    border: 1px solid rgba(46,204,113,0.2);
+    margin-top: 8px;
+  }
+  .mok-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; }
+  .mok-text { font-size: 12px; color: var(--green); }
+
+  /* ─── PRODUCT GRID ─── */
+  .product-area { padding: 32px 40px; }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2px;
+  }
+
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color .25s, transform .25s;
+    overflow: hidden;
+    position: relative;
+  }
+  .product-card:hover {
+    border-color: var(--amber);
+    transform: translateY(-3px);
+    z-index: 1;
+  }
+
+  /* image zone */
+  .card-image {
+    height: 200px;
+    background: var(--card);
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-image::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .card-emoji { font-size: 64px; position: relative; z-index: 1; }
+  .card-cert {
+    position: absolute; top: 12px; right: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    background: rgba(46,204,113,0.15);
+    color: var(--green); border: 1px solid rgba(46,204,113,0.3);
+    padding: 4px 10px;
+  }
+  .card-new {
+    position: absolute; top: 12px; left: 12px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    background: var(--amber); color: var(--ink);
+    padding: 4px 8px; font-weight: 600;
+  }
+
+  .card-body { padding: 24px; }
+  .card-category {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-size: 20px;
+    color: var(--white); line-height: 1.25; margin-bottom: 8px;
+  }
+  .card-name-en {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--muted); margin-bottom: 14px;
+  }
+  .card-desc {
+    font-size: 13px; color: var(--stone); line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  .card-specs {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 20px;
+  }
+  .spec-chip {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    background: var(--border); color: var(--stone);
+    padding: 4px 10px; letter-spacing: 0.06em;
+  }
+
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .card-use-count {
+    font-size: 12px; color: var(--muted);
+  }
+  .card-use-count strong { color: var(--amber); }
+  .card-actions { display: flex; gap: 8px; }
+  .btn-card-dl {
+    background: none; border: 1px solid var(--border);
+    color: var(--stone); padding: 7px 14px;
+    font-size: 11px; letter-spacing: 0.06em; cursor: pointer;
+    transition: all .2s; font-family: 'Sarabun', sans-serif;
+  }
+  .btn-card-dl:hover { border-color: var(--amber); color: var(--amber); }
+  .btn-card-rfq {
+    background: var(--amber); color: var(--ink);
+    border: none; padding: 8px 16px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    cursor: pointer; font-family: 'Sarabun', sans-serif;
+    transition: background .2s;
+  }
+  .btn-card-rfq:hover { background: var(--amber2); }
+
+  /* ─── USE CASE TAGS ─── */
+  .use-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 16px 24px;
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid var(--border);
+  }
+  .use-tag {
+    font-size: 11px; color: var(--muted);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 3px 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark">W</div>
+    <div class="logo-name">Siam Master Concrete</div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">เกี่ยวกับเรา</a></li>
+    <li><a href="#" class="active">สินค้า</a></li>
+    <li><a href="#">ผลงาน</a></li>
+    <li><a href="#">ติดต่อ</a></li>
+  </ul>
+  <button class="btn-sm">ขอใบเสนอราคา</button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div>
+    <div class="page-breadcrumb">หน้าหลัก / <span>ผลิตภัณฑ์</span></div>
+    <h1 class="page-title">ผลิตภัณฑ์<br><em>คุณภาพ</em></h1>
+  </div>
+  <div class="page-count">
+    ผลิตภัณฑ์ทั้งหมด<br>
+    <strong>3</strong> รายการ
+  </div>
+</div>
+
+<!-- CATALOG -->
+<div class="catalog-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">ประเภทสินค้า</div>
+      <div class="filter-list">
+        <div class="filter-item active">
+          <span class="filter-name">ทั้งหมด</span>
+          <span class="filter-count">3</span>
+        </div>
+        <div class="filter-item">
+          <span class="filter-name">เสาไฟฟ้า</span>
+          <span class="filter-count">1</span>
+        </div>
+        <div class="filter-item">
+          <span class="filter-name">แผ่นพื้น</span>
+          <span class="filter-count">1</span>
+        </div>
+        <div class="filter-item">
+          <span class="filter-name">เสาเข็ม</span>
+          <span class="filter-count">1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">การใช้งาน</div>
+      <div class="filter-list">
+        <div class="filter-item">
+          <span class="filter-name">โครงสร้างพื้นฐาน</span>
+        </div>
+        <div class="filter-item">
+          <span class="filter-name">อาคารพาณิชย์</span>
+        </div>
+        <div class="filter-item">
+          <span class="filter-name">คลังสินค้า</span>
+        </div>
+        <div class="filter-item">
+          <span class="filter-name">บ้านจัดสรร</span>
+        </div>
+        <div class="filter-item">
+          <span class="filter-name">ภาครัฐ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">การรับรอง</div>
+      <div class="mok-badge">
+        <span class="mok-dot"></span>
+        <span class="mok-text">ทุกสินค้าผ่าน มอก.</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PRODUCT GRID -->
+  <div class="product-area">
+    <div class="product-grid">
+
+      <!-- Card 1 -->
+      <div class="product-card">
+        <div class="card-image">
+          <div class="card-emoji">🏗️</div>
+          <div class="card-cert">✓ มอก.</div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">Utility · Infrastructure</div>
+          <div class="card-name">เสาไฟฟ้า<br>คอนกรีตอัดแรง</div>
+          <div class="card-name-en">Prestressed Concrete Pole</div>
+          <div class="card-desc">เสาสำหรับระบบไฟฟ้าแรงสูง ผลิตจากคอนกรีตอัดแรง ทนทาน แข็งแกร่ง</div>
+          <div class="card-specs">
+            <span class="spec-chip">8–14 เมตร</span>
+            <span class="spec-chip">200–400 kN</span>
+            <span class="spec-chip">Spun Concrete</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-use-count"><strong>4</strong> use cases</div>
+            <div class="card-actions">
+              <button class="btn-card-dl">⬇ Datasheet</button>
+              <button class="btn-card-rfq">ขอราคา</button>
+            </div>
+          </div>
+        </div>
+        <div class="use-tags">
+          <span class="use-tag">ไฟฟ้าแรงสูง</span>
+          <span class="use-tag">สาธารณูปโภค</span>
+          <span class="use-tag">ถนนและทางหลวง</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card">
+        <div class="card-image">
+          <div class="card-emoji">🏢</div>
+          <div class="card-cert">✓ มอก.</div>
+          <div class="card-new">RARE</div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">Building · Industrial</div>
+          <div class="card-name">แผ่นพื้นสำเร็จรูป<br>Hollow Core</div>
+          <div class="card-name-en">Hollow Core Slab</div>
+          <div class="card-desc">พื้นสำเร็จรูปช่องกลวง น้ำหนักเบา รับแรงสูง เหมาะสำหรับอาคารทุกประเภท</div>
+          <div class="card-specs">
+            <span class="spec-chip">ความหนา 15–32 ซม.</span>
+            <span class="spec-chip">ช่วงพาด 4–14 ม.</span>
+            <span class="spec-chip">ประหยัด 30%</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-use-count"><strong>6</strong> use cases</div>
+            <div class="card-actions">
+              <button class="btn-card-dl">⬇ Datasheet</button>
+              <button class="btn-card-rfq">ขอราคา</button>
+            </div>
+          </div>
+        </div>
+        <div class="use-tags">
+          <span class="use-tag">อาคารสูง</span>
+          <span class="use-tag">คลังสินค้า</span>
+          <span class="use-tag">อาคารจอดรถ</span>
+          <span class="use-tag">คอนโด</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card">
+        <div class="card-image">
+          <div class="card-emoji">⚓</div>
+          <div class="card-cert">✓ มอก.</div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">Foundation · Structure</div>
+          <div class="card-name">เสาเข็ม<br>คอนกรีตอัดแรง</div>
+          <div class="card-name-en">Prestressed Concrete Pile</div>
+          <div class="card-desc">เสาเข็มสำหรับงานฐานรากอาคาร รองรับน้ำหนักได้สูง ผลิตตามมาตรฐาน</div>
+          <div class="card-specs">
+            <span class="spec-chip">0.18–0.40 ม.</span>
+            <span class="spec-chip">6–24 เมตร</span>
+            <span class="spec-chip">300–2,000 kN</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-use-count"><strong>5</strong> use cases</div>
+            <div class="card-actions">
+              <button class="btn-card-dl">⬇ Datasheet</button>
+              <button class="btn-card-rfq">ขอราคา</button>
+            </div>
+          </div>
+        </div>
+        <div class="use-tags">
+          <span class="use-tag">บ้านจัดสรร</span>
+          <span class="use-tag">อาคารพาณิชย์</span>
+          <span class="use-tag">สะพาน</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
