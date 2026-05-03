@@ -42,7 +42,7 @@ RUN chmod +x entrypoint.sh
 
 # Persistent data directories
 RUN mkdir -p /app/data /app/public/uploads \
-    && chown -R node:node /app /app/data /app/public/uploads
+    && chown -R node:node /app/data /app/public/uploads
 
 USER node
 
