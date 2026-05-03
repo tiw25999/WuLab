@@ -3,7 +3,7 @@ FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # ── Stage 2: Build Next.js ────────────────────────────────────────────────
 FROM node:22-bookworm-slim AS builder
