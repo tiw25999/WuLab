@@ -118,6 +118,9 @@ datasource db {
   provider = "sqlite"   // เปลี่ยนเป็น "postgresql" ตอน deploy prod
 }
 
+// productType: "standard" → เพิ่มลงตะกร้า → cart → RFQ
+//              "preorder"  → ปุ่ม RFQ โดยตรง ไม่ผ่าน cart
+
 model Product {
   id           String   @id @default(cuid())
   slug         String   @unique
@@ -126,6 +129,9 @@ model Product {
   descTh       String
   descEn       String
   category     String   // "slab" | "pile" | "pole" | "beam"
+  productType  String   @default("standard") // "standard" | "preorder"
+  leadTimeDays Int?     // preorder only — จำนวนวันผลิต
+  minOrderQty  String?  // ปริมาณสั่งขั้นต่ำ เช่น "50 ต้น"
   imageUrl     String?
   datasheetUrl String?
   specs        String   // JSON string (SQLite ไม่มี Json type)

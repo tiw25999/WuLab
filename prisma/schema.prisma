@@ -15,6 +15,9 @@ model Product {
   descTh       String
   descEn       String
   category     String
+  productType  String   @default("standard") // "standard" | "preorder"
+  leadTimeDays Int?                           // เฉพาะ preorder — จำนวนวันผลิต
+  minOrderQty  String?                        // ปริมาณสั่งขั้นต่ำ เช่น "50 ต้น"
   imageUrl     String?
   datasheetUrl String?
   specs        String

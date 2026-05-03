@@ -6,6 +6,25 @@
 
 ---
 
+## ประเภทสินค้า (productType)
+
+| Value | ความหมาย | UI Label TH | UI Label EN |
+|-------|---------|-------------|-------------|
+| `standard` | สินค้ามาตรฐาน — ขนาดตายตัว ผลิตเป็น batch สม่ำเสมอ | สินค้ามาตรฐาน | Standard Product |
+| `preorder` | Pre-order — ผลิตตามสั่ง ต้องติดต่อก่อน มี lead time | สั่งผลิตพิเศษ | Pre-Order / Custom |
+
+**พฤติกรรม UI แตกต่างกัน:**
+
+| | Standard | Pre-order |
+|--|---------|---------|
+| ปุ่มหน้าสินค้า | เพิ่มลงตะกร้า | ขอใบเสนอราคา (ไปฟอร์ม RFQ โดยตรง) |
+| Cart | เพิ่มได้ปกติ | ไม่ผ่าน cart — RFQ โดยตรง |
+| Badge | — | "สั่งผลิตพิเศษ" (amber) |
+| Lead time | — | แสดง "ระยะเวลาผลิต X วัน" |
+| Min order | แสดงปริมาณสั่งขั้นต่ำ | แสดงปริมาณสั่งขั้นต่ำ |
+
+---
+
 ## Admin Account (1 record)
 
 ```ts
@@ -21,7 +40,7 @@
 
 ## Products (3 records)
 
-### Product 1 — แผ่นพื้น Hollow Core
+### Product 1 — แผ่นพื้น Hollow Core ✦ Standard
 
 ```ts
 {
@@ -29,6 +48,9 @@
   nameTh: "แผ่นพื้นสำเร็จรูป Hollow Core",
   nameEn: "Hollow Core Slab",
   category: "slab",
+  productType: "standard",
+  minOrderQty: "100 ตร.ม.",
+  leadTimeDays: null,
   descTh: "แผ่นพื้นสำเร็จรูปที่มีช่องกลวงภายใน (Hollow Core) ผลิตด้วยเครื่อง Extruder มาตรฐานยุโรป ลดน้ำหนักโครงสร้างได้ถึง 40% เมื่อเทียบกับแผ่นพื้นทึบ กำลังรับน้ำหนักสูง ช่วงพาดยาวได้ถึง 18 เมตรโดยไม่ต้องมีเสากลาง เหมาะสำหรับคลังสินค้า อาคารพาณิชย์ และโครงการขนาดใหญ่",
   descEn: "Hollow Core Slabs manufactured with a European-standard Extruder machine. Reduces structural dead load by up to 40% compared to solid slabs. High load-bearing capacity with spans up to 18 m without intermediate columns. Ideal for warehouses, commercial buildings, and large-scale projects.",
   imageUrl: "/images/hollow-core-slab.jpg",
@@ -40,7 +62,6 @@
     maxLength: "18 ม.",
     concreteGrade: "fck = 40 MPa",
     prestressType: "Pre-tensioned",
-    minOrder: "100 ตร.ม.",
     unit: "ตร.ม."
   },
   useCases: [
@@ -55,7 +76,7 @@
 
 ---
 
-### Product 2 — เสาเข็มคอนกรีตอัดแรง
+### Product 2 — เสาเข็มคอนกรีตอัดแรง ✦ Standard
 
 ```ts
 {
@@ -63,6 +84,9 @@
   nameTh: "เสาเข็มคอนกรีตอัดแรง",
   nameEn: "Prestressed Concrete Pile",
   category: "pile",
+  productType: "standard",
+  minOrderQty: "50 ต้น",
+  leadTimeDays: null,
   descTh: "เสาเข็มคอนกรีตอัดแรงหน้าตัดสี่เหลี่ยม ผ่านมาตรฐาน มอก. 396 รับแรงกดอัดและแรงดึงได้สูง เหมาะสำหรับงานรากฐานอาคารพักอาศัย อาคารพาณิชย์ โรงงาน และโครงสร้างพื้นฐาน",
   descEn: "Square cross-section prestressed concrete pile certified to TIS 396. High compressive and tensile strength. Suitable for foundations of residential, commercial, industrial, and infrastructure projects.",
   imageUrl: "/images/prestressed-pile.jpg",
@@ -73,7 +97,6 @@
     lengths: ["6 ม.", "8 ม.", "10 ม.", "12 ม.", "14 ม.", "16 ม.", "18 ม.", "20 ม.", "24 ม."],
     concreteGrade: "fck = 35 MPa",
     prestressType: "Pre-tensioned",
-    minOrder: "50 ต้น",
     unit: "ต้น"
   },
   useCases: [
@@ -87,7 +110,7 @@
 
 ---
 
-### Product 3 — เสาไฟฟ้าคอนกรีตอัดแรง
+### Product 3 — เสาไฟฟ้าคอนกรีตอัดแรง ✦ Pre-order
 
 ```ts
 {
@@ -95,8 +118,11 @@
   nameTh: "เสาไฟฟ้าคอนกรีตอัดแรง",
   nameEn: "Prestressed Concrete Utility Pole",
   category: "pole",
-  descTh: "เสาไฟฟ้าคอนกรีตอัดแรงทรงกลม (Spun Pile) ผ่านมาตรฐาน มอก. 397 ผลิตด้วยระบบหมุนเหวี่ยงแรงเหวี่ยงสูง (High-speed Centrifugal Casting) ทำให้คอนกรีตแน่น กำลังอัดสูง ทนต่อสภาพอากาศและแรงลม เหมาะสำหรับระบบสายส่งไฟฟ้า",
-  descEn: "Spun prestressed concrete utility pole certified to TIS 397. Manufactured using high-speed centrifugal casting for dense, high-strength concrete. Weather and wind resistant. Designed for power transmission and distribution systems.",
+  productType: "preorder",
+  minOrderQty: "20 ต้น",
+  leadTimeDays: 21,           // ผลิต 21 วันหลังยืนยันออร์เดอร์
+  descTh: "เสาไฟฟ้าคอนกรีตอัดแรงทรงกลม (Spun Pile) ผ่านมาตรฐาน มอก. 397 ผลิตด้วยระบบหมุนเหวี่ยงแรงเหวี่ยงสูง (High-speed Centrifugal Casting) ทำให้คอนกรีตแน่น กำลังอัดสูง ทนต่อสภาพอากาศและแรงลม เหมาะสำหรับระบบสายส่งไฟฟ้า — สั่งผลิตตามความต้องการ",
+  descEn: "Spun prestressed concrete utility pole certified to TIS 397. Manufactured using high-speed centrifugal casting for dense, high-strength concrete. Weather and wind resistant. Made to order — contact us to confirm specifications.",
   imageUrl: "/images/concrete-pole.jpg",
   datasheetUrl: "/datasheets/concrete-pole.pdf",
   specs: {
@@ -105,7 +131,6 @@
     lengths: ["8 ม.", "9 ม.", "10 ม.", "12 ม.", "14 ม.", "16 ม.", "18 ม."],
     concreteGrade: "fck = 45 MPa",
     prestressType: "Pre-tensioned (Spun)",
-    minOrder: "20 ต้น",
     unit: "ต้น"
   },
   useCases: [
@@ -128,8 +153,7 @@
     titleEn: "ABC Logistics Warehouse",
     descTh: "แผ่นพื้น Hollow Core ขนาด 20 ซม. พื้นที่ 8,000 ตร.ม.",
     descEn: "20 cm Hollow Core Slabs, 8,000 sqm floor area",
-    category: "warehouse",
-    year: 2024,
+    category: "warehouse", year: 2024,
     imageUrl: "/images/portfolio/portfolio-01.jpg"
   },
   {
@@ -137,17 +161,15 @@
     titleEn: "Chiang Mai Commercial Complex",
     descTh: "เสาเข็มคอนกรีตอัดแรง ขนาด 0.22 ม. จำนวน 320 ต้น",
     descEn: "220mm Prestressed Piles, 320 units",
-    category: "commercial",
-    year: 2023,
+    category: "commercial", year: 2023,
     imageUrl: "/images/portfolio/portfolio-02.jpg"
   },
   {
-    titleTh: "โรงงานผลิตชิ้นส่วยยานยนต์",
+    titleTh: "โรงงานผลิตชิ้นส่วนยานยนต์",
     titleEn: "Automotive Parts Factory",
-    descTh: "แผ่นพื้น Double-T และ Hollow Core รวม 12,000 ตร.ม.",
-    descEn: "Double-T and Hollow Core combined 12,000 sqm",
-    category: "industrial",
-    year: 2024,
+    descTh: "แผ่นพื้น Hollow Core รวม 12,000 ตร.ม.",
+    descEn: "Hollow Core combined 12,000 sqm",
+    category: "industrial", year: 2024,
     imageUrl: "/images/portfolio/portfolio-03.jpg"
   },
   {
@@ -155,8 +177,7 @@
     titleEn: "Eastern Region Power Grid",
     descTh: "เสาไฟฟ้าคอนกรีตอัดแรง ขนาด 12 ม. จำนวน 450 ต้น",
     descEn: "12m Prestressed Concrete Poles, 450 units",
-    category: "utility",
-    year: 2023,
+    category: "utility", year: 2023,
     imageUrl: "/images/portfolio/portfolio-04.jpg"
   },
   {
@@ -164,8 +185,7 @@
     titleEn: "E-Commerce Distribution Center",
     descTh: "แผ่นพื้น Hollow Core 2 ชั้น พื้นที่รวม 15,000 ตร.ม.",
     descEn: "2-story Hollow Core, 15,000 sqm total",
-    category: "warehouse",
-    year: 2025,
+    category: "warehouse", year: 2025,
     imageUrl: "/images/portfolio/portfolio-05.jpg"
   }
 ]
@@ -177,14 +197,11 @@
 
 ```
 SMC-YYYYMMDD-XXXX
-
-ตัวอย่าง:
-  SMC-20260502-0001   ← inquiry แรกของวันที่ 2026-05-02
-  SMC-20260502-0002   ← inquiry ที่สองของวันเดียวกัน
+ตัวอย่าง: SMC-20260502-0001
 
 Logic:
-  1. นับจำนวน inquiry ที่สร้างในวันนั้น
-  2. เพิ่ม 1 แล้ว format เป็น 4 หลัก (padStart 4, '0')
+  1. นับ inquiry ที่สร้างวันนั้น
+  2. +1 แล้ว padStart(4, '0')
   3. prefix = "SMC-" + format(today, "yyyyMMdd") + "-"
 ```
 

@@ -132,9 +132,17 @@
 | `products.title` | สินค้าคอนกรีตอัดแรง | Prestressed Concrete Products |
 | `products.subtitle` | ผลิตภัณฑ์ได้รับมาตรฐาน มอก. — พร้อม Datasheet ดาวน์โหลดฟรี | All products carry TIS certification — Free Datasheet download available |
 | `products.add_to_cart` | เพิ่มลงตะกร้า | Add to Cart |
+| `products.rfq_direct` | ขอใบเสนอราคา | Request a Quote |
 | `products.view_detail` | รายละเอียด | Details |
 | `products.download` | ดาวน์โหลด Datasheet | Download Datasheet |
+| `products.badge.standard` | สินค้ามาตรฐาน | Standard Product |
+| `products.badge.preorder` | สั่งผลิตพิเศษ | Pre-Order |
+| `products.lead_time` | ระยะเวลาผลิต {days} วัน | Lead time: {days} days |
+| `products.min_order` | สั่งขั้นต่ำ {qty} | Min. order: {qty} |
+| `products.preorder_note` | สินค้านี้ผลิตตามสั่ง — กรุณาติดต่อเพื่อยืนยันสเปคก่อนสั่ง | This product is made to order — please contact us to confirm specifications |
 | `products.filter.all` | ทั้งหมด | All |
+| `products.filter.standard` | สินค้ามาตรฐาน | Standard |
+| `products.filter.preorder` | สั่งผลิตพิเศษ | Pre-Order |
 | `products.filter.slab` | แผ่นพื้น | Floor Slabs |
 | `products.filter.pile` | เสาเข็ม | Piles |
 | `products.filter.pole` | เสาไฟฟ้า | Poles |
