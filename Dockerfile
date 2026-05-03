@@ -1,4 +1,4 @@
-# ── Stage 1: Install dependencies ────────────────────────────────────────
+# ── Stage 1: Install all dependencies (dev + prod) ────────────────────────
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 
@@ -6,7 +6,15 @@ COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm install
 
-# ── Stage 2: Build Next.js ────────────────────────────────────────────────
+# ── Stage 2: Install production-only dependencies ─────────────────────────
+FROM node:22-bookworm-slim AS prod-deps
+WORKDIR /app
+
+COPY package*.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --omit=dev
+
+# ── Stage 3: Build Next.js ────────────────────────────────────────────────
 FROM node:22-bookworm-slim AS builder
 WORKDIR /app
 
@@ -18,18 +26,18 @@ ENV DATABASE_URL=file:/tmp/build.db
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npx prisma generate
-RUN npm run build
+RUN --mount=type=cache,target=/app/.next/cache \
+    npm run build
 
-# ── Stage 3: Production runner ────────────────────────────────────────────
+# ── Stage 4: Production runner ────────────────────────────────────────────
 FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy everything needed to run (including node_modules for native deps)
+COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
