@@ -1,21 +1,31 @@
 # WuLab — Implementation Plan: Phase 1 MVP
 ## Siam Master Concrete Co., Ltd.
 
-> **Updated:** 2026-05-03 | **เป้าหมาย:** ใช้งานได้จริงภายใน 5–7 วัน
-> **Stack:** Next.js 14 · TypeScript · Tailwind CSS · Prisma · SQLite · next-intl · Resend
+> **Updated:** 2026-05-03 | **เป้าหมาย:** ใช้งานได้จริงภายใน 7–10 วัน
+> **Stack:** Next.js 16.2.4 · TypeScript · Tailwind CSS 4 · Prisma 7 · SQLite · next-intl · Resend
+
+## MVP Core Requirements
+> 3 สิ่งนี้ต้องครบก่อน deploy
+
+```
+⭐ Search   — ค้นหาสินค้าได้ทั้งชื่อไทย/อังกฤษ + filter ประเภท/standard/preorder
+⭐ Cart     — ตะกร้าใบเสนอราคา: เพิ่ม/แก้ไข/ลบ บันทึกใน localStorage
+⭐ RFQ      — ฟอร์ม 3 ประเภทลูกค้า + cart pre-fill + email + refCode + track
+```
 
 ---
 
 ## ภาพรวม
 
 ```
-วันที่ 1  → Setup + Database + Navbar/Footer
+วันที่ 1  → Foundation: Seed + i18n + Navbar/Footer + CSS vars  ← ✅ Setup done แล้ว
 วันที่ 2  → Landing Page (Hero, Strengths, CTA)
-วันที่ 3  → Products (list + detail + API)
-วันที่ 4  → RFQ Form + Email + Success page
-วันที่ 5  → i18n + About Page + Track page
-วันที่ 6  → ทดสอบทุกหน้า + Bug fix
-วันที่ 7  → Deploy Vercel Production
+วันที่ 3  → Products API + Search + Product list/detail pages
+วันที่ 4  → Cart System (Context, Panel, CartIcon, AddToCartBtn)
+วันที่ 5  → RFQ Form + Cart pre-fill + Email + Success + Track
+วันที่ 6  → About Page + i18n + Lang toggle
+วันที่ 7  → ทดสอบ Search/Cart/RFQ end-to-end + Bug fix
+วันที่ 8  → Deploy Vercel Production
 ```
 
 ---
@@ -403,17 +413,36 @@ export default async function LocaleLayout({
 
 ### 5.1 API Routes
 
-**`app/api/products/route.ts`** — GET all products
+**`app/api/products/route.ts`** — GET with search + filter
+
+Query params:
+- `q` — full-text search (nameTh, nameEn)
+- `category` — `slab | pile | pole | beam`
+- `type` — `standard | preorder`
+
 ```ts
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
+  const q        = searchParams.get('q') ?? ''
   const category = searchParams.get('category')
+  const type     = searchParams.get('type')
 
   const products = await prisma.product.findMany({
-    where: category ? { category } : undefined,
+    where: {
+      AND: [
+        category ? { category } : {},
+        type     ? { productType: type } : {},
+        q ? {
+          OR: [
+            { nameTh: { contains: q } },
+            { nameEn: { contains: q } },
+          ],
+        } : {},
+      ],
+    },
     orderBy: { createdAt: 'asc' },
   })
 
@@ -443,37 +472,183 @@ export async function GET(
 }
 ```
 
-### 5.2 Product List Page
+### 5.2 Product List Page — Search + Filter
 
-**`app/[locale]/products/page.tsx`**
-- Fetch `/api/products` (server component)
-- Layout: sidebar filter + product grid
-- Filter by category (query param)
-- ดู mockup: `v2-02-products.html`
+**`app/[locale]/products/page.tsx`** (Client Component เพราะมี search state)
+
+```tsx
+'use client'
+// state: q (search text), category, productType
+// เมื่อ q/category/type เปลี่ยน → fetch /api/products?q=&category=&type=
+// ดู mockup: v2-02-products.html
+```
+
+Search bar features:
+- Input type text → debounce 300ms → update query param
+- Placeholder: "ค้นหาสินค้า เช่น Hollow Core, เสาเข็ม..."
+- Clear button (×) เมื่อมีข้อความ
+
+Filter sidebar:
+- ประเภทสินค้า: ทั้งหมด / แผ่นพื้น / เสาเข็ม / เสาไฟฟ้า / คาน
+- รูปแบบ: ทั้งหมด / สินค้ามาตรฐาน / สั่งผลิตพิเศษ
 
 ### 5.3 ProductCard Component
 
 ```tsx
 // components/products/ProductCard.tsx
-type Props = {
-  product: Product
-  locale: string
-}
+type Props = { product: Product; locale: string }
 ```
-- Image | Badges (มอก.) | Category | Name | Specs chips
-- Buttons: รายละเอียด | Datasheet | เพิ่มลงตะกร้า
+
+- Badges: มอก. badge (green) + `productType` badge (standard=none / preorder=amber "สั่งผลิต")
+- Lead time chip: แสดงเมื่อ `productType === 'preorder'` → "ผลิต {leadTimeDays} วัน"
+- Min order chip: แสดงเสมอ → "สั่งขั้นต่ำ {minOrderQty}"
+- ปุ่มหลัก:
+  - `standard` → **เพิ่มลงตะกร้า** (gold)
+  - `preorder`  → **ขอใบเสนอราคา** → link to `/rfq?product={slug}`
 
 ### 5.4 Product Detail Page
 
 **`app/[locale]/products/[slug]/page.tsx`**
-- Full spec table
-- Use cases list
+- Full spec table + use cases + รูปภาพ
 - Download Datasheet button
-- เพิ่มลงตะกร้า button (ใหญ่)
+- ปุ่มหลัก: standard → **เพิ่มลงตะกร้า** | preorder → **ขอใบเสนอราคา**
+- Related products 2–3 รายการ (same category)
 
 ---
 
-## Task 6: RFQ Form + Email
+## Task 6: Inquiry Cart ⭐
+
+**เวลา:** ~3 ชั่วโมง
+
+### 6.1 CartContext — `lib/cart-context.tsx`
+
+```tsx
+'use client'
+import { createContext, useContext, useState, useEffect } from 'react'
+
+export type CartItem = {
+  id: string
+  slug: string
+  nameTh: string
+  nameEn: string
+  quantity: string
+  unit: string
+  note: string
+}
+
+type CartCtx = {
+  items: CartItem[]
+  addItem: (item: Omit<CartItem, 'quantity' | 'note'> & { defaultUnit: string }) => void
+  updateItem: (slug: string, patch: Partial<Pick<CartItem, 'quantity' | 'note'>>) => void
+  removeItem: (slug: string) => void
+  clear: () => void
+  count: number
+}
+
+export const CartContext = createContext<CartCtx | null>(null)
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [items, setItems] = useState<CartItem[]>([])
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('smc-cart')
+    if (saved) setItems(JSON.parse(saved))
+  }, [])
+
+  // Save to localStorage on change
+  useEffect(() => {
+    localStorage.setItem('smc-cart', JSON.stringify(items))
+  }, [items])
+
+  function addItem(product: Omit<CartItem, 'quantity' | 'note'> & { defaultUnit: string }) {
+    setItems(prev => {
+      if (prev.find(i => i.slug === product.slug)) return prev  // ไม่เพิ่มซ้ำ
+      return [...prev, { ...product, quantity: '1', unit: product.defaultUnit, note: '' }]
+    })
+  }
+
+  function updateItem(slug: string, patch: Partial<Pick<CartItem, 'quantity' | 'note'>>) {
+    setItems(prev => prev.map(i => i.slug === slug ? { ...i, ...patch } : i))
+  }
+
+  function removeItem(slug: string) {
+    setItems(prev => prev.filter(i => i.slug !== slug))
+  }
+
+  return (
+    <CartContext.Provider value={{ items, addItem, updateItem, removeItem, clear: () => setItems([]), count: items.length }}>
+      {children}
+    </CartContext.Provider>
+  )
+}
+
+export function useCart() {
+  const ctx = useContext(CartContext)
+  if (!ctx) throw new Error('useCart must be inside CartProvider')
+  return ctx
+}
+```
+
+เพิ่ม `<CartProvider>` ใน `app/[locale]/layout.tsx`
+
+### 6.2 CartIcon — `components/layout/CartIcon.tsx`
+
+```tsx
+'use client'
+import { useCart } from '@/lib/cart-context'
+
+export function CartIcon({ onClick }: { onClick: () => void }) {
+  const { count } = useCart()
+  return (
+    <button onClick={onClick} className="relative w-10 h-10 ...">
+      🛒
+      {count > 0 && (
+        <span className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] bg-red-500 rounded-full text-white text-[10px] font-mono grid place-items-center">
+          {count}
+        </span>
+      )}
+    </button>
+  )
+}
+```
+
+### 6.3 CartPanel — `components/cart/CartPanel.tsx`
+
+Slide-out drawer จาก navbar:
+- Header: "รายการขอใบเสนอราคา" + count badge + ปุ่มปิด (×)
+- Items list: แต่ละ CartItem แสดง icon / ชื่อ / input ปริมาณ / input หมายเหตุ / ปุ่มลบ
+- Footer: จำนวนรายการ + ปุ่ม "ดูสินค้าเพิ่ม" + ปุ่ม **"ขอใบเสนอราคา →"**
+- กด "ขอใบเสนอราคา" → navigate `/rfq` (CartContext ส่งข้อมูลไปให้)
+- ดู mockup: `v2-02-products.html` → `.cart-panel`
+
+### 6.4 AddToCartBtn — `components/products/AddToCartBtn.tsx`
+
+```tsx
+'use client'
+import { useCart } from '@/lib/cart-context'
+
+export function AddToCartBtn({ product }: { product: Product }) {
+  const { addItem, items } = useCart()
+  const inCart = items.some(i => i.slug === product.slug)
+
+  if (product.productType === 'preorder') return null  // ไม่ render สำหรับ preorder
+
+  return (
+    <button
+      onClick={() => addItem({ id: product.id, slug: product.slug, nameTh: product.nameTh, nameEn: product.nameEn, defaultUnit: JSON.parse(product.specs).unit ?? 'รายการ' })}
+      disabled={inCart}
+      className="btn-gold ..."
+    >
+      {inCart ? '✓ อยู่ในตะกร้าแล้ว' : '🛒 เพิ่มลงตะกร้า'}
+    </button>
+  )
+}
+```
+
+---
+
+## Task 7: RFQ Form + Email
 
 **เวลา:** ~4 ชั่วโมง
 
@@ -609,24 +784,36 @@ export async function GET(
 }
 ```
 
-### 6.5 RFQ Form Page
+### 6.5 RFQ Form Page ⭐ Cart pre-fill
 
-**`app/[locale]/rfq/page.tsx`**
-- 3 แท็บ: ทั่วไป | เอกชน | ภาครัฐ (switch form fields)
+**`app/[locale]/rfq/page.tsx`** (Client Component)
+
+```tsx
+'use client'
+import { useCart } from '@/lib/cart-context'
+
+export default function RFQPage() {
+  const { items, clear } = useCart()
+  // items จาก CartContext ถูก pre-fill ลงในฟอร์มอัตโนมัติ
+  // เมื่อ submit สำเร็จ → clear() + redirect /rfq/success?ref=...
+}
+```
+
+- Cart summary panel ขวา: แสดง `items` จาก CartContext (ดู mockup `v2-03-rfq.html`)
+- 3 แท็บ: ทั่วไป | เอกชน | ภาครัฐ
 - Client validation ก่อน submit
-- POST ไป `/api/rfq`
-- Redirect → `/rfq/success?ref=SMC-...`
-- ดู mockup: `v2-03-rfq.html`
-- Cart items panel ด้านขวา (อ่านจาก `?items=...` query หรือ localStorage)
+- POST `/api/rfq` พร้อม `items` array จาก cart
+- สำเร็จ → `clear()` cart → redirect `/rfq/success?ref=SMC-...`
+- preorder product เข้ามาจาก `?product={slug}` query → pre-fill รายการเดียว
 
 ### 6.6 Success + Track pages
 
-**`app/[locale]/rfq/success/page.tsx`** — แสดง refCode + ปุ่ม Track
-**`app/[locale]/rfq/track/page.tsx`** — input refCode → GET `/api/rfq/[ref]` → แสดง status
+**`app/[locale]/rfq/success/page.tsx`** — แสดง refCode + copy button + ปุ่ม Track
+**`app/[locale]/rfq/track/page.tsx`** — input refCode → GET `/api/rfq/[ref]` → แสดง status + items
 
 ---
 
-## Task 7: About Page
+## Task 8: About Page
 
 **เวลา:** ~1 ชั่วโมง | **`app/[locale]/about/page.tsx`**
 

@@ -222,82 +222,82 @@ Admin pages
 
 ## Todo List
 
-### Phase 1 — MVP (5–7 วัน)
+### Phase 1 — MVP (7–10 วัน)
 
-#### Setup
-- [ ] `T1.1` สร้าง Next.js 14 + Tailwind CSS + TypeScript
-- [ ] `T1.2` ติดตั้ง Prisma + SQLite + สร้าง schema
-- [ ] `T1.3` เขียน seed data (3 สินค้า, 1 admin)
-- [ ] `T1.4` ติดตั้ง next-intl + สร้าง th.json / en.json โครงสร้าง
-- [ ] `T1.5` สร้าง Navbar + Footer component
-- [ ] `T1.6` Push ขึ้น GitHub + ตั้งค่า Vercel (preview deploy)
+> **Core MVP:** Search + Cart + RFQ ต้องครบทุกอย่าง
+
+#### Setup ✅ Done
+- [x] `T1.1` สร้าง Next.js 16 + Tailwind CSS 4 + TypeScript + Turbopack
+- [x] `T1.2` ติดตั้ง Prisma 7 + SQLite + schema (Product, Inquiry, Admin, Portfolio)
+- [x] `T1.3` เพิ่ม `productType` (standard/preorder), `leadTimeDays`, `minOrderQty`
+- [x] `T1.4` ติดตั้ง next-intl, Resend, bcryptjs, jsonwebtoken, Vite (mockup dev)
+- [x] `T1.5` Push ขึ้น GitHub + gitignore ครบ
+
+#### Foundation
+- [ ] `T1.6` เขียน seed data — 3 สินค้า (2 standard, 1 preorder) + 1 admin + 5 portfolio
+- [ ] `T1.7` ตั้งค่า next-intl — middleware, th.json, en.json, [locale]/layout.tsx
+- [ ] `T1.8` สร้าง `lib/prisma.ts` singleton
+- [ ] `T1.9` สร้าง Navbar (logo, links, lang toggle, cart icon+badge) + Footer
+- [ ] `T1.10` CSS variables ใน globals.css (--navy, --gold, --chalk, ฯลฯ)
 
 #### Landing Page
-- [ ] `T1.7` HeroSection — headline, subtext, CTA buttons, stats
-- [ ] `T1.8` StrengthsSection — 4 cards (มอก., Hollow Core, กำลังผลิต, คุณภาพ)
-- [ ] `T1.9` ProductsPreview — 3 product cards mini
-- [ ] `T1.10` CTABand — full-width amber band
+- [ ] `T1.11` HeroSection — headline, animated product cards, CTA buttons, stats
+- [ ] `T1.12` TrustStrip — มอก. / 30 ปี / โครงการ / ทั่วไทย
+- [ ] `T1.13` StrengthsSection — 4 cards
+- [ ] `T1.14` UseCaseSection — 4 ประเภทงาน
+- [ ] `T1.15` CTABand — full-width gold gradient
+
+#### Product Catalog + Search ⭐ MVP core
+- [ ] `T1.16` API `GET /api/products?q=&category=&type=` — search + filter
+- [ ] `T1.17` API `GET /api/products/[slug]`
+- [ ] `T1.18` หน้ารายการสินค้า — search bar + filter sidebar + grid
+- [ ] `T1.19` หน้ารายละเอียดสินค้า — spec table + use cases + รูปภาพ + lead time badge
+- [ ] `T1.20` ปุ่ม Download Datasheet + ปุ่ม AddToCart (standard) / RFQ โดยตรง (preorder)
+
+#### Inquiry Cart ⭐ MVP core
+- [ ] `T1.21` `lib/cart-context.tsx` — CartContext + useCart hook + localStorage
+- [ ] `T1.22` `CartIcon` ใน Navbar — badge แสดงจำนวน
+- [ ] `T1.23` `CartPanel` — slide-out drawer
+- [ ] `T1.24` `CartItem` — ปรับปริมาณ/หมายเหตุ/ลบ
+- [ ] `T1.25` `AddToCartBtn` ใน ProductCard + ProductDetail (standard เท่านั้น)
+
+#### RFQ Form ⭐ MVP core
+- [ ] `T1.26` `lib/ref-code.ts` — generate SMC-YYYYMMDD-XXXX
+- [ ] `T1.27` `lib/email.ts` — Resend: admin notification + customer confirmation
+- [ ] `T1.28` API `POST /api/rfq` — save Inquiry + refCode + email
+- [ ] `T1.29` หน้า RFQ — 3 tabs (ทั่วไป/เอกชน/ภาครัฐ) + cart summary panel
+- [ ] `T1.30` Cart → RFQ — pre-fill items จาก CartContext
+- [ ] `T1.31` หน้า Success — แสดง refCode + ปุ่ม Track
+- [ ] `T1.32` API `GET /api/rfq/[ref]` + หน้า Track status
 
 #### About Page
-- [ ] `T1.11` ประวัติบริษัท 30 ปี + วิสัยทัศน์
-- [ ] `T1.12` ใบรับรอง มอก. section
-
-#### Product Catalog
-- [ ] `T1.13` หน้ารายการสินค้า — grid + filter sidebar
-- [ ] `T1.14` หน้ารายละเอียดสินค้า — spec table + use cases + รูปภาพ
-- [ ] `T1.15` ปุ่ม Download Datasheet (PDF)
-- [ ] `T1.16` API `GET /api/products` + `GET /api/products/[slug]`
-
-#### RFQ Form
-- [ ] `T1.17` ฟอร์ม 3 tab (ทั่วไป / เอกชน / ภาครัฐ)
-- [ ] `T1.18` Client-side validation
-- [ ] `T1.19` API `POST /api/rfq` + สร้าง refCode
-- [ ] `T1.20` ส่งอีเมลแจ้งเตือน Admin (Resend)
-- [ ] `T1.21` ส่งอีเมลยืนยัน Customer
-- [ ] `T1.22` หน้า Success + แสดง refCode
+- [ ] `T1.33` ประวัติบริษัท 30 ปี + วิสัยทัศน์ + ใบรับรอง มอก.
 
 #### i18n
-- [ ] `T1.23` แปลเนื้อหาทุกหน้าเป็นไทย-อังกฤษ
-- [ ] `T1.24` Language toggle ใน Navbar
-- [ ] `T1.25` middleware.ts — locale detection
+- [ ] `T1.34` แปลเนื้อหาทุกหน้าเป็นไทย-อังกฤษ (ดู docs/content.md)
+- [ ] `T1.35` Language toggle ใน Navbar
 
 #### Deploy
-- [ ] `T1.26` ทดสอบ mobile + desktop ทุกหน้า
-- [ ] `T1.27` ทดสอบ RFQ form end-to-end
-- [ ] `T1.28` Deploy to Vercel production
-- [ ] `T1.29` ตั้งค่า Environment Variables บน Vercel
+- [ ] `T1.36` ทดสอบ Search, Cart, RFQ end-to-end บน mobile + desktop
+- [ ] `T1.37` Deploy to Vercel production + ตั้งค่า Environment Variables
 
 ---
 
-### Phase 2 — Cart + Sales System (10–14 วัน)
-
-#### Inquiry Cart
-- [ ] `T2.1` สร้าง `CartContext` + `useCart` hook
-- [ ] `T2.2` บันทึก/อ่าน cart จาก localStorage
-- [ ] `T2.3` `CartIcon` component — badge แสดงจำนวน
-- [ ] `T2.4` `CartPanel` — slide-out drawer
-- [ ] `T2.5` `CartItem` — เพิ่ม/ลด/ลบ + หมายเหตุแต่ละรายการ
-- [ ] `T2.6` `AddToCartBtn` ใน ProductCard + ProductDetail
-- [ ] `T2.7` Cart → RFQ — pre-fill สินค้าจาก cart
-- [ ] `T2.8` บันทึก `items` JSON ลงใน Inquiry model
+### Phase 2 — Admin + Sales System (10–14 วัน)
 
 #### Admin Dashboard
-- [ ] `T2.9` Admin login page + API `POST /api/admin/login`
-- [ ] `T2.10` JWT middleware — protect `/admin/*` routes
-- [ ] `T2.11` หน้า Inquiry list — ดู filter ตามสถานะ/วันที่/กลุ่ม
-- [ ] `T2.12` API `PATCH /api/admin/inquiries/[id]` — เปลี่ยนสถานะ
-- [ ] `T2.13` หน้า Inquiry detail — ดูรายละเอียด + items
-- [ ] `T2.14` Admin Product CRUD — เพิ่ม/แก้ไข/ลบสินค้า
-- [ ] `T2.15` อัปโหลดรูปสินค้า (Cloudinary หรือ local)
+- [ ] `T2.1` Admin login page + API `POST /api/admin/login` (JWT)
+- [ ] `T2.2` JWT middleware — protect `/admin/*` routes
+- [ ] `T2.3` หน้า Inquiry list — filter ตามสถานะ/วันที่/กลุ่ม
+- [ ] `T2.4` API `PATCH /api/admin/inquiries/[id]` — เปลี่ยนสถานะ
+- [ ] `T2.5` หน้า Inquiry detail — ดูรายละเอียด + items
+- [ ] `T2.6` Admin Product CRUD — เพิ่ม/แก้ไข/ลบสินค้า
+- [ ] `T2.7` อัปโหลดรูปสินค้า (Cloudinary หรือ local)
 
-#### Tracking
-- [ ] `T2.16` หน้า Track inquiry — กรอก refCode
-- [ ] `T2.17` API `GET /api/rfq/[ref]` — คืน status + สรุป
-
-#### Portfolio
-- [ ] `T2.18` PortfolioItem model + seed data
-- [ ] `T2.19` หน้า Portfolio — filter ตามประเภทงาน
-- [ ] `T2.20` Admin CRUD portfolio items
+#### Portfolio + Export
+- [ ] `T2.8` หน้า Portfolio — filter ตามประเภทงาน
+- [ ] `T2.9` Admin CRUD portfolio items
+- [ ] `T2.10` Export inquiry list เป็น Excel (xlsx)
 
 #### Export
 - [ ] `T2.21` Export inquiry list เป็น Excel (xlsx)

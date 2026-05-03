@@ -146,13 +146,16 @@
 
 ### MVP Deliverables
 
-| ✅ Included in Day 1 | ❌ Not included (next phases) |
-|---------------------|------------------------------|
+| ✅ MVP (Phase 1) | ❌ Phase 2 ขึ้นไป |
+|-----------------|------------------|
 | Landing page + About | Admin dashboard |
-| Product catalog — 3 products with real images | Thai/English language toggle |
-| RFQ form for all 3 customer types | Portfolio page |
-| Email notification to admin | Inquiry status tracking |
-| Live Vercel URL | Customer account system |
+| Product catalog — search + filter + standard/preorder badge | Portfolio page |
+| **Inquiry Cart** — add, edit, remove + localStorage | Customer account system |
+| **RFQ form** — 3 customer types + cart pre-fill | Excel export |
+| Email notification to admin + confirmation to customer | |
+| Inquiry tracking by reference code | |
+| Thai/English language toggle | |
+| Live Vercel URL | |
 
 ---
 
