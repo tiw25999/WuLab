@@ -27,6 +27,7 @@ npm-debug.log*
 mockups/
 images/
 *.png
+!public/logo.png
 public/images/
 public/uploads/
 
