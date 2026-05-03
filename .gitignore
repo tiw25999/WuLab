@@ -27,5 +27,15 @@ mockups/
 images/
 *.png
 public/images/
+public/uploads/
+
+# Build artifacts
+tsconfig.tsbuildinfo
+
+# Debug/temp scripts
+check-*.ts
+
+# Office lock files
+~$*
 
 /app/generated/prisma

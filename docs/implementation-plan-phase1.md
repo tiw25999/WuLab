@@ -356,16 +356,75 @@ export default async function LocaleLayout({
 
 **CSS Variables** (เพิ่มใน `globals.css`):
 ```css
+@import "tailwindcss";
+
 :root {
-  --navy:    #1A1F2E;
-  --surface: #2C3347;
-  --border:  #3D4460;
-  --gold:    #C8922A;
-  --gold2:   #E8A838;
-  --chalk:   #F0EDE8;
-  --stone:   #8A8F9E;
-  --green:   #2A9D5C;
+  /* Background — เน้นขาว */
+  --white:        #FFFFFF;
+  --bg-soft:      #F4F7FB;   /* section สลับ */
+
+  /* Navy — element หลัก */
+  --navy:         #1A2F6E;
+  --navy-dark:    #0F1E4A;   /* hover */
+  --navy-light:   #2A4499;   /* secondary blue */
+
+  /* Yellow — accent + CTA */
+  --yellow:       #F5C200;
+  --yellow-dark:  #D9A800;   /* hover */
+  --yellow-light: #FFF3B0;   /* tint background */
+
+  /* Text */
+  --text-dark:    #1A1A2E;
+  --text-mid:     #4A5568;
+  --text-muted:   #9CA3AF;
+  --border:       #E2E8F0;
+
+  /* Status */
+  --green:        #16A34A;   /* มอก. badge, success */
+  --amber:        #D97706;   /* preorder badge, in-progress */
+  --red:          #DC2626;   /* error, cancelled */
 }
+
+body {
+  background: var(--white);
+  color: var(--text-dark);
+  font-family: 'Sarabun', sans-serif;
+}
+
+.btn-primary {
+  background: var(--yellow);
+  color: var(--navy);
+  font-weight: 700;
+  padding: 0.625rem 1.5rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--yellow-dark); }
+
+.btn-navy {
+  background: var(--navy);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.625rem 1.5rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.btn-navy:hover { background: var(--navy-dark); }
+
+.btn-outline {
+  border: 2px solid var(--navy);
+  color: var(--navy);
+  font-weight: 600;
+  padding: 0.625rem 1.5rem;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.btn-outline:hover { background: var(--navy); color: #fff; }
+```
+
+Google Fonts ใน `app/layout.tsx`:
+```html
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Sarabun:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 ```
 
 **Navbar.tsx** — ดู mockup `v2-01-landing.html` สำหรับ layout:

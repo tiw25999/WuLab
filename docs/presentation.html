@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprint Presentation — SICON WuLab</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sarabun', sans-serif; background: #0f1729; color: #fff; overflow: hidden; }
+
+  .slides { width: 100vw; height: 100vh; position: relative; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 60px; opacity: 0; transition: opacity .4s; }
+  .slide.active { display: flex; opacity: 1; }
+
+  /* Nav */
+  .nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 99; }
+  .nav button { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); color: #fff; padding: 8px 24px; border-radius: 99px; cursor: pointer; font-family: 'Sarabun', sans-serif; font-size: 14px; font-weight: 600; transition: .2s; }
+  .nav button:hover { background: rgba(255,255,255,.3); }
+  .slide-counter { position: fixed; top: 20px; right: 24px; font-size: 13px; color: rgba(255,255,255,.4); }
+
+  /* Slide 1 — Cover */
+  .slide-cover { background: linear-gradient(135deg, #1a2f6e 0%, #0f1729 60%, #1a2f6e 100%); }
+  .slide-cover .badge { background: #f5c200; color: #1a2f6e; font-size: 12px; font-weight: 800; letter-spacing: 2px; padding: 6px 16px; border-radius: 99px; margin-bottom: 24px; display: inline-block; }
+  .slide-cover h1 { font-size: 52px; font-weight: 800; text-align: center; line-height: 1.2; margin-bottom: 16px; }
+  .slide-cover p { color: rgba(255,255,255,.6); font-size: 18px; text-align: center; }
+  .dots { display: flex; gap: 8px; margin-top: 40px; justify-content: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.2); }
+  .dot.on { background: #f5c200; width: 24px; border-radius: 4px; }
+
+  /* Slide 2 — Sprint Planning */
+  .slide-planning { background: #0f1729; }
+  .slide-title { font-size: 14px; font-weight: 700; color: #f5c200; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase; }
+  .slide-h2 { font-size: 36px; font-weight: 800; margin-bottom: 32px; }
+  .sprint-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: 1000px; }
+  .sprint-box { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 24px; }
+  .sprint-box h3 { font-size: 13px; font-weight: 700; color: #f5c200; letter-spacing: 1px; margin-bottom: 16px; text-transform: uppercase; }
+  .us-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .us-badge { background: #1a2f6e; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; color: #f5c200; white-space: nowrap; flex-shrink: 0; }
+  .us-text { font-size: 13px; color: rgba(255,255,255,.8); line-height: 1.5; flex: 1; }
+  .sp-badge { background: rgba(245,194,0,.15); border: 1px solid rgba(245,194,0,.3); border-radius: 99px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #f5c200; white-space: nowrap; flex-shrink: 0; }
+
+  /* Slide 3 — User Story Status */
+  .slide-status { background: #0f1729; }
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 900px; }
+  .col-box { border-radius: 12px; padding: 16px; }
+  .col-todo { background: rgba(100,116,139,.12); border: 1px solid rgba(100,116,139,.2); }
+  .col-doing { background: rgba(217,119,6,.1); border: 1px solid rgba(217,119,6,.2); }
+  .col-done { background: rgba(22,163,74,.1); border: 1px solid rgba(22,163,74,.2); }
+  .col-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+  .col-todo .col-label { color: #94a3b8; }
+  .col-doing .col-label { color: #fbbf24; }
+  .col-done .col-label { color: #4ade80; }
+  .card { background: rgba(255,255,255,.06); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 12px; color: rgba(255,255,255,.75); line-height: 1.5; border-left: 3px solid transparent; }
+  .col-done .card { border-left-color: #16a34a; }
+  .col-doing .card { border-left-color: #d97706; }
+  .empty-state { font-size: 12px; color: rgba(255,255,255,.3); text-align: center; padding: 16px 0; }
+
+  /* Slide 4 — Acceptance Criteria */
+  .slide-ac { background: #0f1729; }
+  .ac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 1000px; }
+  .ac-box { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 18px; }
+  .ac-title { font-size: 12px; font-weight: 700; color: #f5c200; margin-bottom: 10px; }
+  .ac-item { display: flex; gap: 8px; margin-bottom: 7px; font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.4; }
+  .ac-item::before { content: '✓'; color: #4ade80; font-weight: 700; flex-shrink: 0; }
+
+  /* Slide 5 — System Demo */
+  .slide-demo { background: #0f1729; }
+  .flow { display: flex; align-items: center; gap: 0; flex-wrap: nowrap; width: 100%; max-width: 900px; margin-bottom: 32px; }
+  .flow-step { background: rgba(26,47,110,.6); border: 1px solid rgba(26,47,110,.8); border-radius: 12px; padding: 14px 16px; text-align: center; flex: 1; min-width: 0; }
+  .flow-step .num { font-size: 10px; color: #f5c200; font-weight: 700; margin-bottom: 4px; }
+  .flow-step .label { font-size: 12px; font-weight: 700; }
+  .flow-step .sub { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 3px; }
+  .arrow { color: rgba(255,255,255,.3); font-size: 20px; padding: 0 6px; flex-shrink: 0; }
+  .demo-table { width: 100%; max-width: 900px; border-collapse: collapse; }
+  .demo-table th { background: rgba(26,47,110,.8); padding: 10px 16px; font-size: 12px; text-align: left; color: rgba(255,255,255,.7); font-weight: 600; }
+  .demo-table td { padding: 10px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .demo-table td:first-child { color: #f5c200; font-weight: 700; font-size: 12px; }
+  .url { font-family: monospace; font-size: 11px; color: rgba(255,255,255,.4); }
+
+  /* Slide 6 — Summary */
+  .slide-summary { background: linear-gradient(135deg, #1a2f6e 0%, #0f1729 100%); }
+  .sp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 700px; margin-bottom: 32px; }
+  .sp-card { background: rgba(255,255,255,.08); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(255,255,255,.1); }
+  .sp-num { font-size: 48px; font-weight: 800; color: #f5c200; line-height: 1; }
+  .sp-label { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div class="slides">
+
+  <!-- Slide 1: Cover -->
+  <div class="slide slide-cover active" id="s1">
+    <div class="badge">SPRINT REVIEW</div>
+    <h1>ระบบจัดการใบเสนอราคา<br>และคำสั่งซื้อ</h1>
+    <p>บริษัท สยามมาสเตอส์คอนกรีต จำกัด (SICON)</p>
+    <div class="dots">
+      <div class="dot on"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- Slide 2: Sprint Planning -->
+  <div class="slide slide-planning" id="s2">
+    <div class="slide-title">Sprint Planning</div>
+    <div class="slide-h2">User Stories — 2 Sprints</div>
+    <div class="sprint-grid">
+      <div class="sprint-box">
+        <h3>🚀 Sprint 1 — Inquiry & Quotation (14 SP)</h3>
+        <div class="us-item">
+          <div class="us-badge">US1</div>
+          <div class="us-text">ลูกค้ายื่นคำขอใบเสนอราคาออนไลน์</div>
+          <div class="sp-badge">3 SP</div>
+        </div>
+        <div class="us-item">
+          <div class="us-badge">US2</div>
+          <div class="us-text">แอดมินดู/จัดการรายการ RFQ ทั้งหมด</div>
+          <div class="sp-badge">3 SP</div>
+        </div>
+        <div class="us-item">
+          <div class="us-badge">US3</div>
+          <div class="us-text">แอดมินสร้างใบเสนอราคาพร้อมราคา</div>
+          <div class="sp-badge">5 SP</div>
+        </div>
+        <div class="us-item">
+          <div class="us-badge">US4</div>
+          <div class="us-text">ลูกค้าเปิดดูใบเสนอราคาผ่านลิงก์</div>
+          <div class="sp-badge">3 SP</div>
+        </div>
+      </div>
+      <div class="sprint-box">
+        <h3>📦 Sprint 2 — Order Management (15 SP)</h3>
+        <div class="us-item">
+          <div class="us-badge">US5</div>
+          <div class="us-text">แอดมินบันทึก PO พร้อมแนบไฟล์</div>
+          <div class="sp-badge">5 SP</div>
+        </div>
+        <div class="us-item">
+          <div class="us-badge">US6</div>
+          <div class="us-text">แอดมินติดตามออเดอร์ผ่าน Kanban board</div>
+          <div class="sp-badge">5 SP</div>
+        </div>
+        <div class="us-item">
+          <div class="us-badge">US7</div>
+          <div class="us-text">ลูกค้าติดตามสถานะด้วยรหัส SMC</div>
+          <div class="sp-badge">3 SP</div>
+        </div>
+        <div class="us-item">
+          <div class="us-badge">US8</div>
+          <div class="us-text">ดาวน์โหลดใบเสนอราคาเป็น PDF</div>
+          <div class="sp-badge">2 SP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: User Story Status -->
+  <div class="slide slide-status" id="s3">
+    <div class="slide-title">User Story Status</div>
+    <div class="slide-h2">To Do / Doing / Done</div>
+    <div class="kanban">
+      <div class="col-box col-todo">
+        <div class="col-label">📋 To Do</div>
+        <div class="empty-state">ไม่มีรายการ</div>
+      </div>
+      <div class="col-box col-doing">
+        <div class="col-label">⚡ Doing</div>
+        <div class="empty-state">ไม่มีรายการ</div>
+      </div>
+      <div class="col-box col-done">
+        <div class="col-label">✅ Done (8/8)</div>
+        <div class="card">US1 — ฟอร์มขอใบเสนอราคา</div>
+        <div class="card">US2 — Dashboard RFQ</div>
+        <div class="card">US3 — สร้างใบเสนอราคา + QT code</div>
+        <div class="card">US4 — หน้าดูใบเสนอราคา</div>
+        <div class="card">US5 — บันทึก PO + ไฟล์แนบ</div>
+        <div class="card">US6 — Kanban Board</div>
+        <div class="card">US7 — ติดตามสถานะ SMC</div>
+        <div class="card">US8 — PDF ใบเสนอราคา</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Acceptance Criteria -->
+  <div class="slide slide-ac" id="s4">
+    <div class="slide-title">Acceptance Criteria</div>
+    <div class="slide-h2">เงื่อนไขการยอมรับ</div>
+    <div class="ac-grid">
+      <div class="ac-box">
+        <div class="ac-title">US1 — ฟอร์มขอใบเสนอราคา</div>
+        <div class="ac-item">กรอกชื่อ, โทร, ประเภทลูกค้า ได้</div>
+        <div class="ac-item">เพิ่มสินค้าได้หลายรายการ</div>
+        <div class="ac-item">ระบบ generate SMC-YYYYMMDD-XXXX อัตโนมัติ</div>
+        <div class="ac-item">แสดงหน้า confirm พร้อมรหัสอ้างอิง</div>
+      </div>
+      <div class="ac-box">
+        <div class="ac-title">US3 — สร้างใบเสนอราคา</div>
+        <div class="ac-item">คำนวณ subtotal, VAT 7%, total อัตโนมัติ</div>
+        <div class="ac-item">กำหนดอายุและหมายเหตุได้</div>
+        <div class="ac-item">generate QT code + shareable link</div>
+        <div class="ac-item">สร้างใหม่ได้หากยังไม่มี PO</div>
+      </div>
+      <div class="ac-box">
+        <div class="ac-title">US5 — บันทึก PO</div>
+        <div class="ac-item">กรอกเลข PO + แนบไฟล์ PDF/JPG/PNG</div>
+        <div class="ac-item">generate PO-YYYYMMDD-XXXX อัตโนมัติ</div>
+        <div class="ac-item">สินค้า standard ข้ามขั้นผลิต → จัดส่งทันที</div>
+        <div class="ac-item">redirect ไป Kanban หลังบันทึก</div>
+      </div>
+      <div class="ac-box">
+        <div class="ac-title">US7 — ติดตามสถานะ SMC</div>
+        <div class="ac-item">กรอก SMC code เห็นสถานะปัจจุบัน</div>
+        <div class="ac-item">ยังไม่มีใบเสนอ → "กำลังจัดทำ"</div>
+        <div class="ac-item">มีใบเสนอ ยังไม่มี PO → วันหมดอายุ</div>
+        <div class="ac-item">มี PO → 4-step timeline progress</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: System Demo -->
+  <div class="slide slide-demo" id="s5">
+    <div class="slide-title">System Demo</div>
+    <div class="slide-h2">User Journey ในระบบ</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="num">US1</div>
+        <div class="label">ยื่น RFQ</div>
+        <div class="sub">/rfq/new</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="flow-step">
+        <div class="num">US2</div>
+        <div class="label">แอดมินจัดการ</div>
+        <div class="sub">/admin</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="flow-step">
+        <div class="num">US3+US8</div>
+        <div class="label">ออกใบเสนอ + PDF</div>
+        <div class="sub">/admin/rfq/[id]</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="flow-step">
+        <div class="num">US4</div>
+        <div class="label">ลูกค้าดู</div>
+        <div class="sub">/quotation?ref=QT</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="flow-step">
+        <div class="num">US5</div>
+        <div class="label">รับ PO</div>
+        <div class="sub">admin records PO</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="flow-step">
+        <div class="num">US6+US7</div>
+        <div class="label">Track & Kanban</div>
+        <div class="sub">/rfq/track</div>
+      </div>
+    </div>
+    <table class="demo-table">
+      <thead>
+        <tr>
+          <th>User Story</th>
+          <th>หน้าที่ Demo</th>
+          <th>Feature หลัก</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>US1</td><td><span class="url">/rfq/new</span></td><td>กรอกฟอร์ม → ได้รหัส SMC</td></tr>
+        <tr><td>US2</td><td><span class="url">/admin</span></td><td>ตาราง RFQ + filter + badge "ได้รับ PO"</td></tr>
+        <tr><td>US3</td><td><span class="url">/admin/rfq/[id]</span></td><td>กรอกราคา → คำนวณ VAT → copy link</td></tr>
+        <tr><td>US4</td><td><span class="url">/quotation?ref=QT-...</span></td><td>ดูใบเสนอ + สถานะ PO</td></tr>
+        <tr><td>US5</td><td><span class="url">/admin/rfq/[id]</span></td><td>upload PO file → auto PO code</td></tr>
+        <tr><td>US6</td><td><span class="url">/admin/orders</span></td><td>Kanban 4 column + drag & drop</td></tr>
+        <tr><td>US7</td><td><span class="url">/rfq/track</span></td><td>SMC code → timeline 4 ขั้น</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Slide 6: Summary -->
+  <div class="slide slide-summary" id="s6">
+    <div class="slide-title">สรุป</div>
+    <div class="slide-h2" style="margin-bottom:40px">ผลลัพธ์ทั้งหมด</div>
+    <div class="sp-grid">
+      <div class="sp-card">
+        <div class="sp-num">8</div>
+        <div class="sp-label">User Stories</div>
+      </div>
+      <div class="sp-card">
+        <div class="sp-num">29</div>
+        <div class="sp-label">Story Points</div>
+      </div>
+      <div class="sp-card">
+        <div class="sp-num">2</div>
+        <div class="sp-label">Sprints</div>
+      </div>
+    </div>
+    <div style="text-align:center; color:rgba(255,255,255,.5); font-size:14px; margin-top: 8px;">
+      Sprint 1: 14 SP &nbsp;·&nbsp; Sprint 2: 15 SP &nbsp;·&nbsp; Done: 8/8 ✅
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prev()">← ก่อนหน้า</button>
+  <button onclick="next()">ถัดไป →</button>
+</div>
+<div class="slide-counter" id="counter">1 / 6</div>
+
+<script>
+  const total = 6;
+  let cur = 1;
+  function show(n) {
+    document.querySelector('.slide.active')?.classList.remove('active');
+    document.getElementById('s' + n).classList.add('active');
+    document.getElementById('counter').textContent = n + ' / ' + total;
+    cur = n;
+  }
+  function next() { if (cur < total) show(cur + 1); }
+  function prev() { if (cur > 1) show(cur - 1); }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+  });
+</script>
+</body>
+</html>

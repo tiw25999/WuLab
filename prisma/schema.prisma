@@ -27,8 +27,8 @@ model Product {
 }
 
 model Inquiry {
-  id           String   @id @default(cuid())
-  refCode      String   @unique
+  id           String     @id @default(cuid())
+  refCode      String     @unique
   customerType String
   name         String
   phone        String
@@ -40,12 +40,47 @@ model Inquiry {
   delivery     String?
   budget       String?
   govRef       String?
+  taxId        String?  // เลขประจำตัวผู้เสียภาษี 13 หลัก (เอกชน/ภาครัฐ)
+  address      String?  // ที่อยู่ออกใบกำกับภาษี
   message      String?
   items        String
   attachments  String?
-  status       String   @default("new")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  status       String     @default("new")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  quotation    Quotation?
+}
+
+model Quotation {
+  id            String         @id @default(cuid())
+  quoteCode     String         @unique
+  inquiryId     String         @unique
+  inquiry       Inquiry        @relation(fields: [inquiryId], references: [id])
+  items         String         // JSON: [{productName,spec,quantity,unit,unitPrice,total}]
+  subtotal      Float
+  vatRate       Float          @default(7)
+  vatAmount     Float
+  total         Float
+  validDays     Int            @default(30)
+  notes         String?
+  status        String         @default("pending") // pending | accepted | rejected | expired
+  acceptedAt    DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  purchaseOrder PurchaseOrder?
+}
+
+model PurchaseOrder {
+  id               String    @id @default(cuid())
+  poCode           String    @unique
+  quotationId      String    @unique
+  quotation        Quotation @relation(fields: [quotationId], references: [id])
+  customerPoNumber String?   // เลข PO ของลูกค้า
+  customerPoFile   String?   // path ไฟล์ PO ที่ลูกค้าส่งมา
+  status           String    @default("received") // received | in_production | delivered | cancelled
+  notes            String?
+  receivedAt       DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Admin {

@@ -6,6 +6,38 @@
 
 ---
 
+## ข้อมูลบริษัท (จากโบรชัวร์จริง)
+
+```
+ชื่อ:      บริษัท สยามมาสเตอร์คอนกรีต จำกัด (SICON)
+ก่อตั้ง:   พ.ศ. 2537 (1994)
+ที่อยู่:   222 หมู่ที่ 5 ตำบลนาสาร อำเภอพระพรหม
+           จังหวัดนครศรีธรรมราช 80000
+โทร:       075-330-777-9, 075-846-048
+อีเมล:     siaммasters@gmail.com
+Line:      @sicon
+มาตรฐาน:  ISO 9001:2015 + มอก. หลายรายการ
+```
+
+## รูปภาพที่มี (public/images/)
+
+| ไฟล์ | เนื้อหา | ใช้ใน |
+|------|---------|-------|
+| `logo.png` | โลโก้บริษัท | Navbar, Footer, Hero |
+| `hollow-core-slab.jpg` | กองแผ่นพื้น HC ในโรงงาน | Product card + detail |
+| `hollow-core-factory.jpg` | มุมกว้างโรงงาน HC | About / Hero background |
+| `hollow-core-lifting.jpg` | ยกแผ่นพื้น HC ด้วยเครน | Product detail |
+| `hollow-core-extruder.jpg` | เครื่อง Extruder กำลังผลิต | About / Process section |
+| `prestressed-pile.jpg` | เสาเข็มแดง รอขนส่ง | Product card + detail |
+| `prestressed-pile-factory.jpg` | โรงงานผลิตเสาเข็มตัวไอ | Product detail |
+| `hollow-core-datasheet.jpg` | ตาราง Load + diagram HC | Datasheet reference |
+| `pile-sq-datasheet.jpg` | Spec เสาเข็มสี่เหลี่ยมต้น | Datasheet reference |
+| `pile-i-sh-datasheet.jpg` | Spec เสาเข็มตัวไอ + กลวง + รั้ว | Datasheet reference |
+| `girder-datasheet.jpg` | Spec คานสะพาน | Datasheet reference |
+| `company-brochure.jpg` | โบรชัวร์บริษัทเต็มใบ | About page |
+
+---
+
 ## ประเภทสินค้า (productType)
 
 | Value | ความหมาย | UI Label TH | UI Label EN |
@@ -40,7 +72,10 @@
 
 ## Products (3 records)
 
-### Product 1 — แผ่นพื้น Hollow Core ✦ Standard
+### Product 1 — แผ่นพื้น Hollow Core ✦ Pre-order
+
+> ราคาต่อตารางเมตร แบ่งตามความหนา | มาตรฐาน มอก. 828-2549  
+> สูตร: **ราคารวม = ราคาต่อ ตร.ม. × จำนวน ตร.ม. ที่สั่ง**
 
 ```ts
 {
@@ -48,21 +83,31 @@
   nameTh: "แผ่นพื้นสำเร็จรูป Hollow Core",
   nameEn: "Hollow Core Slab",
   category: "slab",
-  productType: "standard",
-  minOrderQty: "100 ตร.ม.",
-  leadTimeDays: null,
-  descTh: "แผ่นพื้นสำเร็จรูปที่มีช่องกลวงภายใน (Hollow Core) ผลิตด้วยเครื่อง Extruder มาตรฐานยุโรป ลดน้ำหนักโครงสร้างได้ถึง 40% เมื่อเทียบกับแผ่นพื้นทึบ กำลังรับน้ำหนักสูง ช่วงพาดยาวได้ถึง 18 เมตรโดยไม่ต้องมีเสากลาง เหมาะสำหรับคลังสินค้า อาคารพาณิชย์ และโครงการขนาดใหญ่",
-  descEn: "Hollow Core Slabs manufactured with a European-standard Extruder machine. Reduces structural dead load by up to 40% compared to solid slabs. High load-bearing capacity with spans up to 18 m without intermediate columns. Ideal for warehouses, commercial buildings, and large-scale projects.",
+  productType: "preorder",
+  minOrderQty: "120 ตร.ม.",
+  leadTimeDays: 14,
+  descTh: "แผ่นพื้นสำเร็จรูปที่มีช่องกลวงภายใน (Hollow Core) ผลิตด้วยเครื่อง Extruder มาตรฐานยุโรป ผ่านมาตรฐาน มอก. 828-2549 ลดน้ำหนักโครงสร้างได้ถึง 40% เมื่อเทียบกับแผ่นพื้นทึบ กำลังรับน้ำหนักสูง ช่วงพาดยาวได้ถึง 18 เมตรโดยไม่ต้องมีเสากลาง เหมาะสำหรับคลังสินค้า อาคารพาณิชย์ และโครงการขนาดใหญ่",
+  descEn: "Hollow Core Slabs certified to TIS 828-2549 with European-standard Extruder. Reduces dead load by up to 40%. Spans up to 18 m. Made to order by thickness and area.",
   imageUrl: "/images/hollow-core-slab.jpg",
   datasheetUrl: "/datasheets/hollow-core-slab.pdf",
   specs: {
-    standard: "มอก. 828-2531",
-    thickness: ["15 ซม.", "20 ซม.", "25 ซม.", "30 ซม."],
+    standard: "มอก. 828-2549",
     width: "1.20 ม.",
     maxLength: "18 ม.",
     concreteGrade: "fck = 40 MPa",
     prestressType: "Pre-tensioned",
-    unit: "ตร.ม."
+    unit: "ตร.ม.",
+    pricingNote: "ราคารวม = ราคาต่อ ตร.ม. × จำนวน ตร.ม. ที่สั่ง",
+    pricing: [
+      { thicknessCm: "8 ซม.",  thickness: 0.08, pricePerSqm: 370 },
+      { thicknessCm: "10 ซม.", thickness: 0.10, pricePerSqm: 390 },
+      { thicknessCm: "12 ซม.", thickness: 0.12, pricePerSqm: 410 },
+      { thicknessCm: "15 ซม.", thickness: 0.15, pricePerSqm: 450 },
+      { thicknessCm: "20 ซม.", thickness: 0.20, pricePerSqm: 470 },
+      { thicknessCm: "25 ซม.", thickness: 0.25, pricePerSqm: 490 },
+      { thicknessCm: "30 ซม.", thickness: 0.30, pricePerSqm: 510 },
+    ]
+    // ตัวอย่าง: ความหนา 20 ซม. × 300 ตร.ม. = 470 × 300 = 141,000 บาท
   },
   useCases: [
     { th: "คลังสินค้า / ศูนย์กระจายสินค้า", en: "Warehouses / Distribution Centers" },
@@ -76,7 +121,10 @@
 
 ---
 
-### Product 2 — เสาเข็มคอนกรีตอัดแรง ✦ Standard
+### Product 2 — เสาเข็มคอนกรีตอัดแรง ✦ Pre-order
+
+> มี 2 รูปทรง: **สี่เหลี่ยมต้น** และ **รูปตัวไอ** — ราคาต่างกัน  
+> ราคา = ราคาต่อเมตร × ความยาว(m)
 
 ```ts
 {
@@ -84,20 +132,58 @@
   nameTh: "เสาเข็มคอนกรีตอัดแรง",
   nameEn: "Prestressed Concrete Pile",
   category: "pile",
-  productType: "standard",
-  minOrderQty: "50 ต้น",
-  leadTimeDays: null,
-  descTh: "เสาเข็มคอนกรีตอัดแรงหน้าตัดสี่เหลี่ยม ผ่านมาตรฐาน มอก. 396 รับแรงกดอัดและแรงดึงได้สูง เหมาะสำหรับงานรากฐานอาคารพักอาศัย อาคารพาณิชย์ โรงงาน และโครงสร้างพื้นฐาน",
-  descEn: "Square cross-section prestressed concrete pile certified to TIS 396. High compressive and tensile strength. Suitable for foundations of residential, commercial, industrial, and infrastructure projects.",
+  productType: "preorder",
+  minOrderQty: "6 ม./ต้น",     // ความยาวขั้นต่ำในการสั่ง = 6 เมตร
+  leadTimeDays: 14,             // 7–14 วันหลังยืนยันออร์เดอร์
+  descTh: "เสาเข็มคอนกรีตอัดแรง ผ่านมาตรฐาน มอก. 396-2549 มีให้เลือก 2 รูปทรง ได้แก่ หน้าตัดสี่เหลี่ยมต้น และรูปตัวไอ รับแรงกดอัดและแรงดึงได้สูง เหมาะสำหรับงานรากฐานอาคารพักอาศัย อาคารพาณิชย์ โรงงาน และโครงสร้างพื้นฐาน",
+  descEn: "Prestressed concrete pile certified to TIS 396-2549. Available in square and I-shape cross-sections. High compressive and tensile strength. Suitable for residential, commercial, industrial, and infrastructure foundations.",
   imageUrl: "/images/prestressed-pile.jpg",
   datasheetUrl: "/datasheets/prestressed-pile.pdf",
   specs: {
     standard: "มอก. 396-2549",
-    sizes: ["0.18 × 0.18 ม.", "0.22 × 0.22 ม.", "0.26 × 0.26 ม.", "0.30 × 0.30 ม.", "0.35 × 0.35 ม."],
-    lengths: ["6 ม.", "8 ม.", "10 ม.", "12 ม.", "14 ม.", "16 ม.", "18 ม.", "20 ม.", "24 ม."],
     concreteGrade: "fck = 35 MPa",
     prestressType: "Pre-tensioned",
-    unit: "ต้น"
+    unit: "ต้น",
+    // ตารางราคา — ราคาต่อต้น = pricePerMeter × length
+    pricingNote: "ราคาต่อต้น = ราคาต่อเมตร × ความยาว",
+    // 3 รูปทรง — จาก datasheet จริง
+    shapes: [
+      {
+        shape: "สี่เหลี่ยมต้น (SQ)",
+        shapeEn: "Square Section",
+        // ขนาดจาก datasheet: 15,18,22,26,30,35,40,45 cm
+        sizes: ["15×15","18×18","22×22","26×26","30×30","35×35","40×40","45×45"],
+        maxLength: { "15×15":6,"18×18":14,"22×22":19,"26×26":22,"30×30":24,"35×35":25,"40×40":27,"45×45":27 },
+        // ราคาจาก PO list (ขนาดที่มีราคา 22–40 cm, ความยาว 6 ม.)
+        pricing: [
+          { size: "0.22×0.22", length: 6, pricePerMeter: 250, pricePerUnit: 1500 },
+          { size: "0.26×0.26", length: 6, pricePerMeter: 280, pricePerUnit: 1680 },
+          { size: "0.30×0.30", length: 6, pricePerMeter: 310, pricePerUnit: 1860 },
+          { size: "0.35×0.35", length: 6, pricePerMeter: 340, pricePerUnit: 2040 },
+          { size: "0.40×0.40", length: 6, pricePerMeter: 370, pricePerUnit: 2220 }
+        ]
+      },
+      {
+        shape: "รูปตัวไอ (I)",
+        shapeEn: "I-Shape Section",
+        sizes: ["15×15","18×18","22×22","26×26"],
+        maxLength: { "15×15":6,"18×18":14,"22×22":18,"26×26":21 },
+        pricing: [
+          { size: "0.22×0.22", length: 6, pricePerMeter: 230, pricePerUnit: 1380 },
+          { size: "0.26×0.26", length: 6, pricePerMeter: 260, pricePerUnit: 1560 },
+          { size: "0.30×0.30", length: 6, pricePerMeter: 290, pricePerUnit: 1740 },
+          { size: "0.35×0.35", length: 6, pricePerMeter: 320, pricePerUnit: 1920 },
+          { size: "0.40×0.40", length: 6, pricePerMeter: 350, pricePerUnit: 2100 }
+        ]
+      },
+      {
+        shape: "สี่เหลี่ยมกลวง (SH)",
+        shapeEn: "Hollow Square Section",
+        sizes: ["15×15","18×18","22×22","26×26"],
+        maxLength: { "15×15":6,"18×18":14,"22×22":19,"26×26":22 },
+        pricing: [] // ราคาตามใบเสนอราคา — ติดต่อสอบถาม
+      }
+    ]
   },
   useCases: [
     { th: "รากฐานอาคารพักอาศัย", en: "Residential Building Foundations" },
@@ -110,7 +196,9 @@
 
 ---
 
-### Product 3 — เสาไฟฟ้าคอนกรีตอัดแรง ✦ Pre-order
+### Product 3 — เสาไฟฟ้าคอนกรีตอัดแรง ✦ Standard
+
+> ราคามาตรฐาน กฟภ — fixed price ต่อความยาว
 
 ```ts
 {
@@ -118,20 +206,26 @@
   nameTh: "เสาไฟฟ้าคอนกรีตอัดแรง",
   nameEn: "Prestressed Concrete Utility Pole",
   category: "pole",
-  productType: "preorder",
-  minOrderQty: "20 ต้น",
-  leadTimeDays: 21,           // ผลิต 21 วันหลังยืนยันออร์เดอร์
-  descTh: "เสาไฟฟ้าคอนกรีตอัดแรงทรงกลม (Spun Pile) ผ่านมาตรฐาน มอก. 397 ผลิตด้วยระบบหมุนเหวี่ยงแรงเหวี่ยงสูง (High-speed Centrifugal Casting) ทำให้คอนกรีตแน่น กำลังอัดสูง ทนต่อสภาพอากาศและแรงลม เหมาะสำหรับระบบสายส่งไฟฟ้า — สั่งผลิตตามความต้องการ",
-  descEn: "Spun prestressed concrete utility pole certified to TIS 397. Manufactured using high-speed centrifugal casting for dense, high-strength concrete. Weather and wind resistant. Made to order — contact us to confirm specifications.",
+  productType: "standard",
+  minOrderQty: null,            // ไม่มีขั้นต่ำ
+  leadTimeDays: null,
+  descTh: "เสาไฟฟ้าคอนกรีตอัดแรงทรงกลม (Spun) ผ่านมาตรฐาน มอก. 397 และราคามาตรฐาน กฟภ ผลิตด้วยระบบหมุนเหวี่ยงแรงเหวี่ยงสูง (High-speed Centrifugal Casting) ทำให้คอนกรีตแน่น กำลังอัดสูง ทนต่อสภาพอากาศและแรงลม พร้อมส่งจากสต็อก",
+  descEn: "Spun prestressed concrete utility pole certified to TIS 397 at PEA standard pricing. High-strength, weather and wind resistant. In-stock sizes available.",
   imageUrl: "/images/concrete-pole.jpg",
   datasheetUrl: "/datasheets/concrete-pole.pdf",
   specs: {
     standard: "มอก. 397-2524",
-    diameters: ["0.15 ม. (6 นิ้ว)", "0.20 ม. (8 นิ้ว)", "0.25 ม. (10 นิ้ว)"],
-    lengths: ["8 ม.", "9 ม.", "10 ม.", "12 ม.", "14 ม.", "16 ม.", "18 ม."],
+    priceStandard: "ราคามาตรฐาน กฟภ",
     concreteGrade: "fck = 45 MPa",
     prestressType: "Pre-tensioned (Spun)",
-    unit: "ต้น"
+    unit: "ต้น",
+    // ตารางราคา fixed ต่อความยาว
+    pricing: [
+      { length: 8,    pricePerUnit: 4000 },
+      { length: 9,    pricePerUnit: 4500 },
+      { length: 12,   pricePerUnit: 6000 },
+      { length: 12.2, pricePerUnit: 8000 }
+    ]
   },
   useCases: [
     { th: "สายส่งไฟฟ้าแรงสูง", en: "High-Voltage Transmission Lines" },
