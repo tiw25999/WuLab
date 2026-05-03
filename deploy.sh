@@ -6,7 +6,7 @@ echo "==> Pulling latest code..."
 git pull origin main
 
 echo "==> Rebuilding app container..."
-docker compose build --no-cache app
+docker compose build app
 
 echo "==> Restarting services..."
 docker compose up -d

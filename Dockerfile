@@ -3,7 +3,8 @@ FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN --mount=type=cache,target=/root/.npm \
+    npm install
 
 # ── Stage 2: Build Next.js ────────────────────────────────────────────────
 FROM node:22-bookworm-slim AS builder
