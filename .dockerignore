@@ -9,7 +9,6 @@ public/uploads/
 .env.production
 mockups/
 docs/
-prisma/migrations/
 npm-debug.log*
 tsconfig.tsbuildinfo
 check-*.ts
