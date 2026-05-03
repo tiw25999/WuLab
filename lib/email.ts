@@ -1,6 +1,8 @@
 ﻿import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY ?? "re_placeholder");
+}
 
 interface RfqEmailData {
   refCode: string;
@@ -30,7 +32,7 @@ export async function sendRfqNotification(data: RfqEmailData): Promise<void> {
   };
 
   // fire-and-forget — ไม่ throw แม้ล้มเหลว
-  resend.emails
+  getResend().emails
     .send({
       from: fromEmail,
       to: adminEmail,
@@ -60,7 +62,7 @@ export async function sendRfqConfirmation(data: RfqEmailData): Promise<void> {
     .map((i) => `<li>${i.productName} — ${i.quantity} ${i.unit}</li>`)
     .join("");
 
-  resend.emails
+  getResend().emails
     .send({
       from: fromEmail,
       to: data.customerEmail,
