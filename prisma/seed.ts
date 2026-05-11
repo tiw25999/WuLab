@@ -8,9 +8,14 @@ const adapter = new PrismaBetterSqlite3({ url: dbUrl });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  const existing = await prisma.product.count();
+  if (existing > 0) {
+    console.log(`✅ Already seeded (${existing} products), skipping.`);
+    return;
+  }
+
   console.log("🌱 Seeding database...");
 
-  // ลบข้อมูลเดิม
   await prisma.portfolioItem.deleteMany();
   await prisma.inquiry.deleteMany();
   await prisma.product.deleteMany();
