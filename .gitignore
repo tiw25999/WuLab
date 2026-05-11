@@ -26,6 +26,7 @@ npm-debug.log*
 # Assets (not tracked)
 mockups/
 images/
+!public/images/
 *.png
 !public/logo.png
 public/uploads/
