@@ -28,7 +28,6 @@ mockups/
 images/
 *.png
 !public/logo.png
-public/images/
 public/uploads/
 
 # Build artifacts
